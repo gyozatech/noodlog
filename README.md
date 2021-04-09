@@ -1,8 +1,12 @@
 # Noodlog
 
-A Golang JSON parametrized logging library.
+![alt text](assets/noodlogo.png?raw=true)
 
-Allows you to:
+## Summary
+
+Noodlog is a Golang JSON parametrized logging library.
+
+It allows you to:
 
 - apply and choose colors to your logging
 - apply pretty-printing or not
