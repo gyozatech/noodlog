@@ -21,6 +21,25 @@ var logLevels = map[string]int{
 	fatalLabel: fatalLevel,
 }
 
+func SetConfigs(configs Configs) {
+	if configs.LogLevel != nil {
+		LogLevel(*configs.LogLevel)
+	}
+	if configs.JSONPrettyPrint != nil {
+		JSONPrettyPrint = *configs.JSONPrettyPrint
+	}
+	if configs.Color != nil {
+		colorEnabled = *configs.Color
+	}
+	if configs.CustomColors != nil {
+		setCustomColors(*configs.CustomColors)
+	}
+	if configs.SensitiveParams != nil {
+		setSensitiveParams(configs.SensitiveParams)
+	}
+
+}
+
 // LogLevel function sets the log level
 func LogLevel(level string) {
 	logLevel = logLevels[level]
@@ -141,4 +160,8 @@ func stringify(message []interface{}) string {
 func adaptMessage(message interface{}) interface{} {
 	// TODO
 	return message
+}
+
+func setSensitiveParams(params []string) {
+	//TODO
 }

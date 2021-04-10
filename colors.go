@@ -72,3 +72,21 @@ func getColorByName(color string) string {
 	}
 	return colorCode
 }
+
+func setCustomColors(colors CustomColors) {
+	if colors.Trace != nil {
+		SetTraceColor(*colors.Trace)
+	}
+	if colors.Debug != nil {
+		SetDebugColor(*colors.Debug)
+	}
+	if colors.Info != nil {
+		SetInfoColor(*colors.Info)
+	}
+	if colors.Warn != nil {
+		SetWarnColor(*colors.Warn)
+	}
+	if colors.Error != nil {
+		SetErrorColor(*colors.Error)
+	}
+}
