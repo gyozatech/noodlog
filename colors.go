@@ -8,42 +8,67 @@ const (
 	colorBlue   = "\033[34m"
 	colorPurple = "\033[35m"
 	colorCyan   = "\033[36m"
-	colorWhite  = "\033[37m"
 )
 
 var colorMap = map[string]string{
-   "trace": colorReset,
-   "info": colorReset,
-   "debug": colorGreen,
-   "warn": colorYellow,
-   "error": colorRed,
+	"trace": colorReset,
+	"info":  colorReset,
+	"debug": colorGreen,
+	"warn":  colorYellow,
+	"error": colorRed,
 }
 
-SetTraceColor(color string) {
-   colorMap[traceLabel] = getColorByName(color)
+var colorNames = map[string]string{
+	"default": colorReset,
+	"red":     colorRed,
+	"green":   colorGreen,
+	"yellow":  colorYellow,
+	"blue":    colorBlue,
+	"purple":  colorPurple,
+	"cyan":    colorCyan,
 }
 
-SetDebugColor(color string) {
-   colorMap[debugLabel] = getColorByName(color)
+var colorEnabled = false
+
+// EnableColors function enables colored logging
+func EnableColors() {
+	colorEnabled = true
 }
 
-SetInfoColor(color string) {
-   colorMap[infoLabel] = getColorByName(color)
+// EnableColors function disables colored logging
+func DisableColors() {
+	colorEnabled = true
 }
 
-SetWarnColor(color string) {
-   colorMap[warnLabel] = getColorByName(color)
+// SetTraceColor overrides the trace level log color with the one specified in input
+func SetTraceColor(color string) {
+	colorMap[traceLabel] = getColorByName(color)
 }
 
-SetErrorColor(color string) {
-   colorMap[errorLabel] = getColorByName(color)
+// SetDebugColor overrides the debug level log color with the one specified in input
+func SetDebugColor(color string) {
+	colorMap[debugLabel] = getColorByName(color)
 }
 
-func getColorByName(color) string {
-   // TODO
-   return ""
+// SetInfoColor overrides the info level log color with the one specified in input
+func SetInfoColor(color string) {
+	colorMap[infoLabel] = getColorByName(color)
 }
 
+// SetWarnColor overrides the warn level log color with the one specified in input
+func SetWarnColor(color string) {
+	colorMap[warnLabel] = getColorByName(color)
+}
 
+// SetErrorColor overrides the error level log color with the one specified in input
+func SetErrorColor(color string) {
+	colorMap[errorLabel] = getColorByName(color)
+}
 
-
+func getColorByName(color string) string {
+	colorCode := colorNames[color]
+	if colorCode == "" {
+		colorCode = colorReset
+	}
+	return colorCode
+}
