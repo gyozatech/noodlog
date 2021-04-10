@@ -1,9 +1,6 @@
 package noodlog
 
 const (
-	file     = "file"
-	function = "function"
-
 	traceLabel = "trace"
 	debugLabel = "debug"
 	infoLabel  = "info"

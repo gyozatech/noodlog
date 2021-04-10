@@ -82,17 +82,17 @@ func printLog(label string, message []interface{}) {
 }
 
 func composeLog(level string, message []interface{}) string {
-	caller := map[string]string{}
-	if traceCallerEnabled {
-		caller = traceCaller()
-	}
 
 	logMsg := record{
-		File:     caller[file],
-		Function: caller[function],
-		Level:    level,
-		Message:  composeMessage(message),
-		Time:     strings.Split(time.Now().String(), "m")[0],
+		Level:   level,
+		Message: composeMessage(message),
+		Time:    strings.Split(time.Now().String(), "m")[0],
+	}
+
+	if traceCallerEnabled {
+		f, fx := traceCaller()
+		logMsg.File = &f
+		logMsg.Function = &fx
 	}
 
 	var jsn []byte
