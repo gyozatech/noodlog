@@ -1,31 +1,21 @@
 package noodlog
 
-const (
-	colorReset  = "\033[0m"
-	colorRed    = "\033[31m"
-	colorGreen  = "\033[32m"
-	colorYellow = "\033[33m"
-	colorBlue   = "\033[34m"
-	colorPurple = "\033[35m"
-	colorCyan   = "\033[36m"
-)
-
 var colorMap = map[string]string{
-	"trace": colorReset,
-	"info":  colorReset,
-	"debug": colorGreen,
-	"warn":  colorYellow,
-	"error": colorRed,
+	traceLabel: colorReset,
+	infoLabel:  colorReset,
+	debugLabel: colorGreen,
+	warnLabel:  colorYellow,
+	errorLabel: colorRed,
 }
 
-var colorNames = map[string]string{
-	"default": colorReset,
-	"red":     colorRed,
-	"green":   colorGreen,
-	"yellow":  colorYellow,
-	"blue":    colorBlue,
-	"purple":  colorPurple,
-	"cyan":    colorCyan,
+var colors = map[string]string{
+	defaultColor: colorReset,
+	redColor:     colorRed,
+	greenColor:   colorGreen,
+	yellowColor:  colorYellow,
+	blueColor:    colorBlue,
+	purpleColor:  colorPurple,
+	cyanColor:    colorCyan,
 }
 
 var colorEnabled = false
@@ -66,7 +56,7 @@ func SetErrorColor(color string) {
 }
 
 func getColorByName(color string) string {
-	colorCode := colorNames[color]
+	colorCode := colors[color]
 	if colorCode == "" {
 		colorCode = colorReset
 	}

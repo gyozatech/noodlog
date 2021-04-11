@@ -28,6 +28,16 @@ func SetConfigs(configs Configs) {
 	if configs.JSONPrettyPrint != nil {
 		JSONPrettyPrint = *configs.JSONPrettyPrint
 	}
+	if configs.TraceCaller != nil {
+		traceCallerEnabled = *configs.TraceCaller
+	}
+	if configs.SinglePointTracing != nil {
+		if *(configs.SinglePointTracing) {
+			EnableSinglePointTracing()
+		} else {
+			DisableSinglePointTracing()
+		}
+	}
 	if configs.Color != nil {
 		colorEnabled = *configs.Color
 	}
