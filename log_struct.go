@@ -11,13 +11,14 @@ type record struct {
 
 // Configs struct contains all possible configs for noodlog
 type Configs struct {
-	LogLevel           *string
-	JSONPrettyPrint    *bool
-	TraceCaller        *bool
-	SinglePointTracing *bool
-	Color              *bool
-	CustomColors       *CustomColors
-	SensitiveParams    []string
+	LogLevel             *string
+	JSONPrettyPrint      *bool
+	TraceCaller          *bool
+	SinglePointTracing   *bool
+	Color                *bool
+	CustomColors         *CustomColors
+	ObscureSensitiveData *bool
+	SensitiveParams      []string
 }
 
 // CustomColors struct is used to specify the custom colors for the various log levels

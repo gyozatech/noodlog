@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
 
 var logLevel int = infoLevel
 var JSONPrettyPrint bool = false
+var obscureSensitiveDataEnabled bool = false
 
 var logLevels = map[string]int{
 	traceLabel: traceLevel,
@@ -20,6 +22,8 @@ var logLevels = map[string]int{
 	panicLabel: panicLevel,
 	fatalLabel: fatalLevel,
 }
+
+var sensitiveParams = []string{}
 
 func SetConfigs(configs Configs) {
 	if configs.LogLevel != nil {
@@ -44,6 +48,9 @@ func SetConfigs(configs Configs) {
 	if configs.CustomColors != nil {
 		setCustomColors(*configs.CustomColors)
 	}
+	if configs.ObscureSensitiveData != nil {
+		obscureSensitiveDataEnabled = *configs.ObscureSensitiveData
+	}
 	if configs.SensitiveParams != nil {
 		setSensitiveParams(configs.SensitiveParams)
 	}
@@ -66,6 +73,22 @@ func EnableJSONPrettyPrint() {
 // DisableJSONPrettyPrint diables JSON pretty printing
 func DisableJSONPrettyPrint() {
 	JSONPrettyPrint = false
+}
+
+// EnableObscureSensitiveData enables sensitive data obscuration from json logs
+func EnableObscureSensitiveData(params []string) {
+	obscureSensitiveDataEnabled = true
+	SetSensitiveParams(params)
+}
+
+// DisableObscureSensitiveData disables sensitive data obscuration from json logs
+func DisableObscureSensitiveData() {
+	obscureSensitiveDataEnabled = false
+}
+
+// SetSensitiveParams sets sensitive data obscuration from json logs
+func SetSensitiveParams(params []string) {
+	sensitiveParams = params
 }
 
 // Trace function prints a log with trace log level
@@ -170,15 +193,40 @@ func stringify(message []interface{}) string {
 func adaptMessage(message interface{}) interface{} {
 	switch message.(type) {
 	case string:
-		if byteMsg := []byte(message.(string)); json.Valid(byteMsg) {
-			var obj interface{}
-			_ = json.Unmarshal(byteMsg, obj)
-			return obj
+		strMsg := message.(string)
+		if obscureSensitiveDataEnabled && len(sensitiveParams) != 0 {
+			return strToObj(obscureSensitiveData(strMsg))
+		}
+	default:
+		if obscureSensitiveDataEnabled && len(sensitiveParams) != 0 {
+			jsn, _ := json.Marshal(message)
+			strMsg := obscureSensitiveData(string(jsn))
+			return strToObj(strMsg)
 		}
 	}
 	return message
 }
 
-func setSensitiveParams(params []string) {
-	//TODO
+func strToObj(strMsg string) interface{} {
+	if byteMsg := []byte(strMsg); json.Valid(byteMsg) {
+		var obj interface{}
+		_ = json.Unmarshal(byteMsg, obj)
+		return obj
+	}
+	return strMsg
+}
+
+func obscureSensitiveData(jsn string) string {
+	for _, param := range sensitiveParams {
+		jsn = obscureParam(jsn, param)
+	}
+	return jsn
+}
+
+func obscureParam(jsn string, param string) string {
+	rWithSlash := *regexp.MustCompile(`\\"` + param + `\\":.*?"(.*?)\\"`)
+	jsn = rWithSlash.ReplaceAllString(jsn, `\"`+param+`\": \"**********\"`)
+
+	rWithoutSlash := *regexp.MustCompile(`"` + param + `":.*?"(.*?)"`)
+	return rWithoutSlash.ReplaceAllString(jsn, `"`+param+`": "**********"`)
 }
