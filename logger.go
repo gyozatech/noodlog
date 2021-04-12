@@ -161,14 +161,21 @@ func stringify(message []interface{}) string {
 	msg := ""
 	for _, m := range message {
 		if m != nil {
-			msg = msg + fmt.Sprintf("%v", m)
+			msg = msg + fmt.Sprintf("%v ", m)
 		}
 	}
-	return msg
+	return msg[:len(msg)-2]
 }
 
 func adaptMessage(message interface{}) interface{} {
-	// TODO
+	switch message.(type) {
+	case string:
+		if byteMsg := []byte(message.(string)); json.Valid(byteMsg) {
+			var obj interface{}
+			_ = json.Unmarshal(byteMsg, obj)
+			return obj
+		}
+	}
 	return message
 }
 
