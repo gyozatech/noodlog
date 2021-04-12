@@ -52,7 +52,7 @@ func SetConfigs(configs Configs) {
 		obscureSensitiveDataEnabled = *configs.ObscureSensitiveData
 	}
 	if configs.SensitiveParams != nil {
-		setSensitiveParams(configs.SensitiveParams)
+		SetSensitiveParams(configs.SensitiveParams)
 	}
 
 }
