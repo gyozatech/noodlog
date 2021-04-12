@@ -187,7 +187,7 @@ func stringify(message []interface{}) string {
 			msg = msg + fmt.Sprintf("%v ", m)
 		}
 	}
-	return msg[:len(msg)-2]
+	return msg[:len(msg)-1]
 }
 
 func adaptMessage(message interface{}) interface{} {
@@ -197,6 +197,7 @@ func adaptMessage(message interface{}) interface{} {
 		if obscureSensitiveDataEnabled && len(sensitiveParams) != 0 {
 			return strToObj(obscureSensitiveData(strMsg))
 		}
+		return strToObj(strMsg)
 	default:
 		if obscureSensitiveDataEnabled && len(sensitiveParams) != 0 {
 			jsn, _ := json.Marshal(message)
@@ -210,7 +211,7 @@ func adaptMessage(message interface{}) interface{} {
 func strToObj(strMsg string) interface{} {
 	if byteMsg := []byte(strMsg); json.Valid(byteMsg) {
 		var obj interface{}
-		_ = json.Unmarshal(byteMsg, obj)
+		_ = json.Unmarshal(byteMsg, &obj)
 		return obj
 	}
 	return strMsg
