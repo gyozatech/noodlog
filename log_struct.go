@@ -15,7 +15,7 @@ type Configs struct {
 	JSONPrettyPrint      *bool
 	TraceCaller          *bool
 	SinglePointTracing   *bool
-	Color                *bool
+	Colors               *bool
 	CustomColors         *CustomColors
 	ObscureSensitiveData *bool
 	SensitiveParams      []string

@@ -47,7 +47,7 @@ func init() {
          LogLevel: log.LevelTrace,
          JSONPrettyPrint: log.Enable,
          TraceCaller: log.Enable,
-         Color: log.Enable,
+         Colors: log.Enable,
          CustomColors: &log.CustomColors{ Trace: log.Cyan },
          ObscureSensitiveData: log.Enable,
          SensitiveParams: []string{"password"},
@@ -160,7 +160,7 @@ or
 ```golang
 log.SetConfigs(
       log.Configs{
-         Color: log.Enable,
+         Colors: log.Enable,
       },
     )
 
@@ -177,7 +177,7 @@ or
 ```golang
 log.SetConfigs(
       log.Configs{
-         Color: log.Disable,
+         Colors: log.Disable,
       },
     )
 
@@ -199,7 +199,7 @@ or
 ```golang
 log.SetConfigs(
       log.Configs{
-         Color: log.Enable,
+         Colors: log.Enable,
          CustomColors: &log.CustomColors{ 
              Trace: log.Cyan, 
              Debug: log.Green,
@@ -220,6 +220,66 @@ When enabled, the **default colors** are:
 - _error_: "red"
 
 ### Trace the caller
+
+Noodles allows you to print the file and the function which are calling the log functions.
+
+**To enable** the trace caller you can use:
+```golang
+log.EnableTraceCaller()
+```
+or
+```golang
+log.SetConfigs(
+      log.Configs{
+         TraceCaller: log.Enable,
+      },
+    )
+```
+`log.Enable` is a pre-built pointer to the bool _true_.
+
+**To disable** it:
+```golang
+log.DisableTraceCaller()
+```
+or
+```golang
+log.SetConfigs(
+      log.Configs{
+         TraceCaller: log.Disable,
+      },
+    )
+```
+`log.Disable` is a pre-built pointer to the bool _false_.
+
+The **default value** is _false_.
+
+**Important**: if you want to import **noodlog** only in one package of your project (in order to configure it once) and wraps the logging functions you can use the `EnableSinglePointTracing` to trace file and function the real caller and not of your logging package.
+
+For example:
+
+`main.go`
+```golang
+package main
+
+import (
+   log "example/logging"
+)
+
+func main() {
+   log.Info("Hello folks!")
+}
+```
+
+`logging/logger.go`
+```golang
+package logging
+
+import (
+    log "github.com/gyozatech/noodlog"
+)
+
+```
+
 
 ### Sensitive params
 

@@ -42,8 +42,8 @@ func SetConfigs(configs Configs) {
 			DisableSinglePointTracing()
 		}
 	}
-	if configs.Color != nil {
-		colorEnabled = *configs.Color
+	if configs.Colors != nil {
+		colorEnabled = *configs.Colors
 	}
 	if configs.CustomColors != nil {
 		setCustomColors(*configs.CustomColors)
