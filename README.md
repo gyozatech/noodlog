@@ -48,7 +48,7 @@ func init() {
          JSONPrettyPrint: log.Enable,
          TraceCaller: log.Enable,
          Color: log.Enable,
-         CustomColors: &log.CustomColors{ Trace: log.Purple },
+         CustomColors: &log.CustomColors{ Trace: log.Cyan },
          ObscureSensitiveData: log.Enable,
          SensitiveParams: []string{"password"},
       },
@@ -56,12 +56,22 @@ func init() {
 }
 
 func main() {
+    // simple string message (with custom color)
     log.Trace("Hello world!")
+    
+    // chaining elements
     log.Info("You've reached", 3, "login attemps")
+    
+    // using string formatting
     log.Warn("You have %d attempts left", 2)
-
+    
+    // logging a struct with a JSON
     log.Error(struct{Code int; Error string}{500, "Generic Error"})
+    
+    // logging a raw JSON string with a JSON (with obscuring "password")
     log.Info(`{"username": "gyozatech", "password": "Gy0zApAssw0rd"}`)
+    
+    // logging a JSON string with a JSON (with obscuring "password")
     log.Info("{\"username\": \"nooduser\", \"password\": \"N0oDPasSw0rD\"}")
 }
 ```
