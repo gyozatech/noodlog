@@ -86,7 +86,67 @@ You'll get the following output:
 
 ## Settings
 
+**Noodlog** allows you to customize the logs through various settings.
+You can use various facility functions or the `SetConfigs` function which wraps all the configs together.
+
+### LogLevel Settings
+
+To set the logging level you can use the facility method:
+
+```golang
+log.LogLevel("warn")
+```
+or
+
+```golang
+log.SetConfigs(
+      log.Configs{
+         LogLevel: log.LevelWarn,
+      },
+    )
+
+```
+`log.LevelWarn` is a pre-built pointer to the string "warn".
+
+**The default log level is info**.
+
 ### JSON Pretty Printing
+
+**To enable** pretty printing of the JSON logs you can use:
+
+```golang
+log.EnableJSONPrettyPrint()
+```
+or
+
+```golang
+log.SetConfigs(
+      log.Configs{
+        JSONPrettyPrint: log.Enable,
+      },
+    )
+
+```
+`log.Enable` is a pre-built pointer to the bool _true_.
+
+**To disable** pretty printing you can use:
+
+```golang
+log.DisableJSONPrettyPrint()
+```
+or
+
+```golang
+log.SetConfigs(
+      log.Configs{
+        JSONPrettyPrint: log.Disable,
+      },
+    )
+
+```
+`log.Disable` is a pre-built pointer to the bool _false_.
+
+**The default value is _false_** 
 
 ### Colors
 
