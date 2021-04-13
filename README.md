@@ -266,6 +266,7 @@ import (
 )
 
 func main() {
+   // main.main real caller we want to track 
    log.Info("Hello folks!")
 }
 ```
@@ -275,8 +276,25 @@ func main() {
 package logging
 
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+func init() {
+    // configure logger once
+    noodlog.SetConfig(
+        noodlog.Configs{
+         TraceCaller: noodlog.Enable,
+         SinglePointTracing: noodlog.Enable,
+      },
+    )
+}
+
+// wrapper function
+func Info(message ...interface{}) {
+    // if we wouldn't enable SinglePointTracing
+    // logger.Info would have been considered the caller to be tracked
+    noodlog.Info(message...)
+}
 
 ```
 
