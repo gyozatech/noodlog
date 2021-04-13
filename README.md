@@ -89,7 +89,7 @@ You'll get the following output:
 **Noodlog** allows you to customize the logs through various settings.
 You can use various facility functions or the `SetConfigs` function which wraps all the configs together.
 
-### LogLevel Settings
+### LogLevel
 
 To set the logging level you can use the facility method:
 
@@ -146,9 +146,78 @@ log.SetConfigs(
 ```
 `log.Disable` is a pre-built pointer to the bool _false_.
 
-**The default value is _false_** 
+**The default value is _false_**. 
 
 ### Colors
+
+**To enable** colors in JSON logs you can use:
+
+```golang
+log.EnableColors()
+```
+or
+
+```golang
+log.SetConfigs(
+      log.Configs{
+         Color: log.Enable,
+      },
+    )
+
+```
+`log.Enable` is a pre-built pointer to the bool _true_.
+
+**To disable** colors you can use:
+
+```golang
+log.DisableColors()
+```
+or
+
+```golang
+log.SetConfigs(
+      log.Configs{
+         Color: log.Disable,
+      },
+    )
+
+```
+`log.Disable` is a pre-built pointer to the bool _false_.
+
+**The default value is _false_**. 
+
+** You can customize the single colors (for log level) by using:
+
+```golang
+log.SetTraceColor("cyan")
+log.SetDebugColor("green")
+log.SetInfoColor("default")
+log.SetWarnColor("yellow")
+log.SetErrorColor("purple")
+```
+or
+```golang
+log.SetConfigs(
+      log.Configs{
+         Color: log.Enable,
+         CustomColors: &log.CustomColors{ 
+             Trace: log.Cyan, 
+             Debug: log.Green,
+             Info:  log.Default,
+             Warn:  log.Yellow,
+             Error: log.Purple,    
+         },
+      },
+    )
+```
+`log.Cyan`, `log.Green`, `log.Default`, `log.Yellow`, `log.Purple`, `log.Red`, `log.Blue` are pre-build pointers to the strings "cyan", "green", "default", "yellow", "purple", "red", "blue".
+
+When enabled, the **default colors** are:
+- _trace_: "default"
+- _info_:  "default"
+- _debug_: "green"
+- _warn_:  "yellow"
+- _error_: "red"
 
 ### Trace the caller
 
