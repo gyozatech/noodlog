@@ -91,26 +91,40 @@ You can use various facility functions or the `SetConfigs` function which wraps 
 
 ### LogLevel
 
-To set the logging level you can use the facility method:
+To set the logging level, after importing the library with:
+
+```golang
+import (
+    log "github.com/gyozatech/noodlog"
+)
+```
+you can use the facility method:
 
 ```golang
 log.LogLevel("warn")
 ```
-or
+or the `SetConfigs` function:
 
 ```golang
 log.SetConfigs(
-      log.Configs{
-         LogLevel: log.LevelWarn,
-      },
-    )
-
+    log.Configs{
+        LogLevel: log.LevelWarn,
+    },
+)
 ```
 `log.LevelWarn` is a pre-built pointer to the string "warn".
 
 **The default log level is info**.
 
 ### JSON Pretty Printing
+
+After importing the library with:
+
+```golang
+import (
+    log "github.com/gyozatech/noodlog"
+)
+```
 
 **To enable** pretty printing of the JSON logs you can use:
 
@@ -121,15 +135,14 @@ or
 
 ```golang
 log.SetConfigs(
-      log.Configs{
-        JSONPrettyPrint: log.Enable,
-      },
-    )
-
+    log.Configs{
+    JSONPrettyPrint: log.Enable,
+    },
+)
 ```
 `log.Enable` is a pre-built pointer to the bool _true_.
 
-**To disable** pretty printing you can use:
+**to disable** pretty printing you can use:
 
 ```golang
 log.DisableJSONPrettyPrint()
@@ -138,11 +151,10 @@ or
 
 ```golang
 log.SetConfigs(
-      log.Configs{
-        JSONPrettyPrint: log.Disable,
-      },
-    )
-
+    log.Configs{
+    JSONPrettyPrint: log.Disable,
+    },
+)
 ```
 `log.Disable` is a pre-built pointer to the bool _false_.
 
@@ -150,7 +162,15 @@ log.SetConfigs(
 
 ### Colors
 
-**To enable** colors in JSON logs you can use:
+After importing the library with:
+
+```golang
+import (
+    log "github.com/gyozatech/noodlog"
+)
+```
+
+**to enable** colors in JSON logs you can use:
 
 ```golang
 log.EnableColors()
@@ -159,11 +179,10 @@ or
 
 ```golang
 log.SetConfigs(
-      log.Configs{
-         Colors: log.Enable,
-      },
-    )
-
+    log.Configs{
+        Colors: log.Enable,
+    },
+)
 ```
 `log.Enable` is a pre-built pointer to the bool _true_.
 
@@ -176,17 +195,16 @@ or
 
 ```golang
 log.SetConfigs(
-      log.Configs{
-         Colors: log.Disable,
-      },
-    )
-
+    log.Configs{
+        Colors: log.Disable,
+    },
+)
 ```
 `log.Disable` is a pre-built pointer to the bool _false_.
 
 **The default value is _false_**. 
 
-** You can customize the single colors (for log level) by using:
+**You can customize the single colors** (for log level) by using:
 
 ```golang
 log.SetTraceColor("cyan")
@@ -198,17 +216,17 @@ log.SetErrorColor("purple")
 or
 ```golang
 log.SetConfigs(
-      log.Configs{
-         Colors: log.Enable,
-         CustomColors: &log.CustomColors{ 
-             Trace: log.Cyan, 
-             Debug: log.Green,
-             Info:  log.Default,
-             Warn:  log.Yellow,
-             Error: log.Purple,    
-         },
-      },
-    )
+    log.Configs{
+        Colors: log.Enable,
+        CustomColors: &log.CustomColors{ 
+            Trace: log.Cyan, 
+            Debug: log.Green,
+            Info:  log.Default,
+            Warn:  log.Yellow,
+            Error: log.Purple,    
+        },
+    },
+)
 ```
 `log.Cyan`, `log.Green`, `log.Default`, `log.Yellow`, `log.Purple`, `log.Red`, `log.Blue` are pre-build pointers to the strings "cyan", "green", "default", "yellow", "purple", "red", "blue".
 
@@ -223,17 +241,25 @@ When enabled, the **default colors** are:
 
 Noodles allows you to print the file and the function which are calling the log functions.
 
-**To enable** the trace caller you can use:
+After importing the library with:
+
+```golang
+import (
+    log "github.com/gyozatech/noodlog"
+)
+```
+
+**to enable** the trace caller you can use:
 ```golang
 log.EnableTraceCaller()
 ```
 or
 ```golang
 log.SetConfigs(
-      log.Configs{
-         TraceCaller: log.Enable,
-      },
-    )
+    log.Configs{
+        TraceCaller: log.Enable,
+    },
+)
 ```
 `log.Enable` is a pre-built pointer to the bool _true_.
 
@@ -244,10 +270,10 @@ log.DisableTraceCaller()
 or
 ```golang
 log.SetConfigs(
-      log.Configs{
-         TraceCaller: log.Disable,
-      },
-    )
+    log.Configs{
+        TraceCaller: log.Disable,
+    },
+)
 ```
 `log.Disable` is a pre-built pointer to the bool _false_.
 
@@ -295,11 +321,54 @@ func Info(message ...interface{}) {
     // logger.Info would have been considered the caller to be tracked
     noodlog.Info(message...)
 }
-
 ```
 
-
 ### Sensitive params
+
+Noodlog gives you the possibility to enable the **obscuration of sensitive params when recognized in the JSON structures** (not in the simple strings that you compose).
+
+After importing the library with:
+
+```golang
+import (
+    log "github.com/gyozatech/noodlog"
+)
+```
+
+You can **enable** the sensitive params obscuration with the facility methods:
+
+```golang
+log.EnableObscureSensitiveData([]string{"param1", "param2", "param3"})
+```
+or with the `SetConfig` function:
+
+```golang
+log.SetConfigs(
+    log.Configs{
+        ObscureSensitiveData: log.Enable,
+        SensitiveParams: []string{"param1", "param2", "param3"},
+    },
+)
+```
+Where `log.Enable` is a pre-built pointer to the bool _true_.
+
+**To disable** the sensitive params obscuration you can set:
+
+```golang
+log.DisableObscureSensitiveData()
+```
+or 
+```golang
+log.SetConfigs(
+    log.Configs{
+        ObscureSensitiveData: log.Disable,
+    },
+)
+```
+Where `log.Disable` is a pre-built pointer to the bool _false_.
+
+The *default* value for the obscuration is _false_.
+
 
 ## Contribute to the project
 
