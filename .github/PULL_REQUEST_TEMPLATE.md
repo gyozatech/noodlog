@@ -1,4 +1,4 @@
-<!-- please add a icon to the title of this PR -->
+<!-- please add an icon to the title of this PR -->
 <!-- the icon will be either 💥 (major or breaking changes), ✨ (feature additions), 🐛 (patch and bugfixes), 📖 (documentation or proposals), or 🛠️ (other things) -->
 
 **What this PR does / why we need it**:
