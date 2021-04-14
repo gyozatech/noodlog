@@ -25,7 +25,7 @@ func EnableColors() {
 	colorEnabled = true
 }
 
-// EnableColors function disables colored logging
+// DisableColors function disables colored logging
 func DisableColors() {
 	colorEnabled = true
 }

@@ -9,8 +9,13 @@ import (
 	"time"
 )
 
+// logLevel represents the log level flag
 var logLevel int = infoLevel
+
+// JSONPrettyPrint represents the pretty printing flag
 var JSONPrettyPrint bool = false
+
+// obscureSensitiveDataEnabled represents the sensitive data obscuration flag
 var obscureSensitiveDataEnabled bool = false
 
 var logLevels = map[string]int{
@@ -25,6 +30,7 @@ var logLevels = map[string]int{
 
 var sensitiveParams = []string{}
 
+// SetConfigs function allows you to add all the configs at once
 func SetConfigs(configs Configs) {
 	if configs.LogLevel != nil {
 		LogLevel(*configs.LogLevel)
