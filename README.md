@@ -89,6 +89,8 @@ You'll get the following output:
 **Noodlog** allows you to customize the logs through various settings.
 You can use various facility functions or the `SetConfigs` function which wraps all the configs together.
 
+----
+
 ### LogLevel
 
 To set the logging level, after importing the library with:
@@ -115,6 +117,8 @@ log.SetConfigs(
 `log.LevelWarn` is a pre-built pointer to the string "warn".
 
 **The default log level is info**.
+
+----
 
 ### JSON Pretty Printing
 
@@ -159,6 +163,8 @@ log.SetConfigs(
 `log.Disable` is a pre-built pointer to the bool _false_.
 
 **The default value is _false_**. 
+
+----
 
 ### Colors
 
@@ -236,6 +242,8 @@ When enabled, the **default colors** are:
 - _debug_: "green"
 - _warn_:  "yellow"
 - _error_: "red"
+
+----
 
 ### Trace the caller
 
@@ -323,6 +331,8 @@ func Info(message ...interface{}) {
 }
 ```
 
+----
+
 ### Sensitive params
 
 Noodlog gives you the possibility to enable the **obscuration of sensitive params when recognized in the JSON structures** (not in the simple strings that you compose).
@@ -369,6 +379,7 @@ Where `log.Disable` is a pre-built pointer to the bool _false_.
 
 The *default* value for the obscuration is _false_.
 
+----
 
 ## Contribute to the project
 
