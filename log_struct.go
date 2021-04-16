@@ -23,11 +23,11 @@ type Configs struct {
 
 // CustomColors struct is used to specify the custom colors for the various log levels
 type CustomColors struct {
-	Trace *string
-	Debug *string
-	Info  *string
-	Warn  *string
-	Error *string
+	Trace Color
+	Debug Color
+	Info  Color
+	Warn  Color
+	Error Color
 }
 
 // ~~~~~~~~~~~ Prebuilt pointers to be used in the SetConfigs ~~~~~~~~~~~~ //

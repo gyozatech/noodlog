@@ -55,7 +55,7 @@ func init() {
          JSONPrettyPrint: log.Enable,
          TraceCaller: log.Enable,
          Colors: log.Enable,
-         CustomColors: &log.CustomColors{ Trace: log.Cyan },
+         CustomColors: &log.CustomColors{ Trace: log.NewColor(log.Cyan) },
          ObscureSensitiveData: log.Enable,
          SensitiveParams: []string{"password"},
       },
@@ -217,14 +217,55 @@ log.SetConfigs(
 
 **The default value is _false_**. 
 
+#### Composition of a color
+
+Color can be composed with text color and background color.
+For each level it can be composed using a string or a true color notation.
+
+The **basic** usage is creating a new color like: 
+```golang
+log.NewColor(log.Red)
+```
+It results a red text on default background
+
+Adding a background color can be done through:
+```golang
+log.NewColor(log.Red).Background(log.Cyan)
+```
+In this scenario it prints red text on cyan background
+
+A third option is to edit just background color using default text color:
+```golang
+log.Background(log.Cyan)
+```
+`log.Cyan`, `log.Green`, `log.Default`, `log.Yellow`, `log.Purple`, `log.Red`, `log.Blue` are pre-build pointers to the strings "cyan", "green", "default", "yellow", "purple", "red", "blue".
+
+Library provides also more customization through the usage of true color notation (RGB value).
+Before the usage of this notation, please consider if your terminal supports truecolor.
+For instance if you execute (printf required):
+
+```golang
+printf "\e[38;2;255;0;0mHello World\n\e[0m"
+```
+a red text "Hello World" should be displayed on the screen
+
+In this way a wider set of color is available for logging, besides of the previous way it can be created a color as:
+```golang
+log.NewColorRGB(255,0,0).BackgroundRGB(0,0,255)
+```
+Where a red text (255 for red, 0 the others) is showed on blue background (255 for blue, 0 for others).
+
+As in the previous scenario, ``NewColorRGB`` and ``BackgroundRGB`` hasn't to be executed combined.
+
+
 **You can customize the single colors** (for log level) by using:
 
 ```golang
-log.SetTraceColor("cyan")
-log.SetDebugColor("green")
-log.SetInfoColor("default")
-log.SetWarnColor("yellow")
-log.SetErrorColor("purple")
+log.SetTraceColor(log.Cyan)
+log.SetDebugColor(log.Green)
+log.SetInfoColor(log.Red)
+log.SetWarnColor(log.Yellow)
+log.SetErrorColor(log.Purple)
 ```
 or
 ```golang
@@ -232,16 +273,15 @@ log.SetConfigs(
     log.Configs{
         Colors: log.Enable,
         CustomColors: &log.CustomColors{ 
-            Trace: log.Cyan, 
-            Debug: log.Green,
-            Info:  log.Default,
-            Warn:  log.Yellow,
-            Error: log.Purple,    
+            Trace: log.NewColor(log.Cyan), 
+            Debug: log.NewColor(log.Green),
+            Info:  log.NewColor(log.Default),
+            Warn:  log.NewColor(log.Yellow),
+            Error: log.NewColor(log.Purple),    
         },
     },
 )
 ```
-`log.Cyan`, `log.Green`, `log.Default`, `log.Yellow`, `log.Purple`, `log.Red`, `log.Blue` are pre-build pointers to the strings "cyan", "green", "default", "yellow", "purple", "red", "blue".
 
 When enabled, the **default colors** are:
 - _trace_: "default"
