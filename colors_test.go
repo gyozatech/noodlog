@@ -24,6 +24,8 @@ func TestGetColorByName(t *testing.T) {
 }
 
 func TestSetCustomColors(t *testing.T) {
+	errFormat := "TestSetCustomColors failed: expected %s found %s"
+
 	setCustomColors(CustomColors{
 		Trace: Blue,
 		Debug: Purple,
@@ -33,42 +35,63 @@ func TestSetCustomColors(t *testing.T) {
 	})
 
 	if colorMap[traceLabel] != colorBlue {
-		t.Errorf("TestSetCustomColors failed: expected blue found %s", colorMap[traceLabel])
+		t.Errorf(errFormat, blueColor, colorMap[traceLabel])
 	}
 	if colorMap[debugLabel] != colorPurple {
-		t.Errorf("TestSetCustomColors failed: expected purple found %s", colorMap[debugLabel])
+		t.Errorf(errFormat, purpleColor, colorMap[debugLabel])
 	}
 	if colorMap[infoLabel] != colorYellow {
-		t.Errorf("TestSetCustomColors failed: expected yellow found %s", colorMap[infoLabel])
+		t.Errorf(errFormat, yellowColor, colorMap[infoLabel])
 	}
 	if colorMap[warnLabel] != colorGreen {
-		t.Errorf("TestSetCustomColors failed: expected green found %s", colorMap[warnLabel])
+		t.Errorf(errFormat, greenColor, colorMap[warnLabel])
 	}
 	if colorMap[errorLabel] != colorReset {
-		t.Errorf("TestSetCustomColors failed: expected default found %s", colorMap[errorLabel])
+		t.Errorf(errFormat, defaultColor, colorMap[errorLabel])
 	}
 }
 
 func TestEnableDisableColors(t *testing.T) {
-	//TODO
+	errFormat := "TestEnableDisableColors failed: expected %v colorEnabled, got %v"
+	if colorEnabled {
+		t.Errorf(errFormat, false, true)
+	}
+	EnableColors()
+	if !colorEnabled {
+		t.Errorf(errFormat, true, false)
+	}
 }
 
 func TestSetTraceColor(t *testing.T) {
-	//TODO
+	setColorAssertions("TestSetTraceColor", traceLabel, SetTraceColor, t)
 }
 
 func TestSetDebugColor(t *testing.T) {
-	//TODO
+	setColorAssertions("TestSetDebugColor", traceLabel, SetTraceColor, t)
 }
 
 func TestSetInfoColor(t *testing.T) {
-	//TODO
+	setColorAssertions("TestSetInfoColor", traceLabel, SetTraceColor, t)
 }
 
 func TestSetWarnColor(t *testing.T) {
-	//TODO
+	setColorAssertions("TestSetWarnColor", traceLabel, SetTraceColor, t)
 }
 
 func TestSetErrorColor(t *testing.T) {
-	//TODO
+	setColorAssertions("TestSetErrorColor", traceLabel, SetTraceColor, t)
+}
+
+func setColorAssertions(testName string, label string, setFunction func(color string), t *testing.T) {
+	errFormat := "%s failed: expected %s, found %s"
+	testMap := map[string]string{
+		blueColor:   colorBlue,
+		purpleColor: colorPurple,
+	}
+	for color, colorCode := range testMap {
+		setFunction(color)
+		if actualCode := colorMap[label]; actualCode != colorCode {
+			t.Errorf(errFormat, testName, colorCode, actualCode)
+		}
+	}
 }
