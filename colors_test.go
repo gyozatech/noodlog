@@ -24,7 +24,7 @@ func TestGetColorByName(t *testing.T) {
 }
 
 func TestSetCustomColors(t *testing.T) {
-	errFormat := "TestSetCustomColors failed: expected %s found %s"
+	errFormat := "TestSetCustomColors failed: expected %s got %s"
 
 	setCustomColors(CustomColors{
 		Trace: Blue,
