@@ -1,6 +1,8 @@
 package noodlog
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 )
 
@@ -135,6 +137,31 @@ func TestEnableDisableJSONPrettyPrint(t *testing.T) {
 	DisableJSONPrettyPrint()
 	if JSONPrettyPrint {
 		t.Errorf(errFormat, false, JSONPrettyPrint)
+	}
+}
+
+var testsuite = []struct {
+	in       interface{}
+	expected string
+}{
+	{"This is a test", `"message":"This is a test"`},
+	{42, `"message":42`},
+	{13.75, `"message":13.75`},
+	{false, `"message":false`},
+}
+
+func TestSimpleLogger(t *testing.T) {
+
+	var b bytes.Buffer
+	LogWriter(&b)                        // we want to write log in memory
+	SetConfigs(Configs{Colors: Disable}) // we don't want any ANSI sequence in the strings
+
+	for _, tt := range testsuite {
+		b.Reset()
+		Info(tt.in)
+		if !strings.Contains(b.String(), tt.expected) {
+			t.Errorf("Failed Test logger! Expected: %v, got: %v", tt.expected, b.String())
+		}
 	}
 }
 
