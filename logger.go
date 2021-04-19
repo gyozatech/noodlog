@@ -3,6 +3,7 @@ package noodlog
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strings"
@@ -11,6 +12,9 @@ import (
 
 // logLevel represents the log level flag
 var logLevel int = infoLevel
+
+// logWriter is the io.Writer where messages get written
+var logWriter io.Writer = os.Stdout
 
 // JSONPrettyPrint represents the pretty printing flag
 var JSONPrettyPrint bool = false
@@ -69,6 +73,12 @@ func LogLevel(level string) {
 	if logLevel == 0 {
 		logLevel = infoLevel
 	}
+}
+
+// LogWriter function sets the new writer
+// TODO: if handle is a file, disable color and indentation ?
+func LogWriter(w io.Writer) {
+	logWriter = w
 }
 
 // EnableJSONPrettyPrint enables JSON pretty printing
@@ -135,7 +145,7 @@ func Fatal(message ...interface{}) {
 
 func printLog(label string, message []interface{}) {
 	if logLevels[label] >= logLevel {
-		fmt.Println(composeLog(label, message))
+		fmt.Fprintf(logWriter, composeLog(label, message))
 	}
 }
 
@@ -187,12 +197,13 @@ func composeMessage(message []interface{}) interface{} {
 }
 
 func stringify(message []interface{}) string {
-	msg := ""
+	var b strings.Builder
 	for _, m := range message {
 		if m != nil {
-			msg = msg + fmt.Sprintf("%v ", m)
+			fmt.Fprintf(&b, "%v ", m)
 		}
 	}
+	msg := b.String()
 	return msg[:len(msg)-1]
 }
 
