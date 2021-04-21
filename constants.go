@@ -25,11 +25,19 @@ const (
 	purpleColor  = "purple"
 	cyanColor    = "cyan"
 
-	colorReset  = "\033[0m"
-	colorRed    = "\033[31m"
-	colorGreen  = "\033[32m"
-	colorYellow = "\033[33m"
-	colorBlue   = "\033[34m"
-	colorPurple = "\033[35m"
-	colorCyan   = "\033[36m"
+	colorReset = "\033[0m"
+
+	colorRed    = "31"
+	colorGreen  = "32"
+	colorYellow = "33"
+	colorBlue   = "34"
+	colorPurple = "35"
+	colorCyan   = "36"
+
+	backgroundRed    = "41"
+	backgroundGreen  = "42"
+	backgroundYellow = "43"
+	backgroundBlue   = "44"
+	backgroundPurple = "45"
+	backgroundCyan   = "46"
 )
