@@ -7,15 +7,15 @@ type Color struct {
 }
 
 var colorMap = map[string]string{
-	traceLabel: resetColor,
-	infoLabel:  resetColor,
+	traceLabel: colorReset,
+	infoLabel:  colorReset,
 	debugLabel: NewColor(Green).ToCode(),
 	warnLabel:  NewColor(Yellow).ToCode(),
 	errorLabel: NewColor(Red).ToCode(),
 }
 
 var colors = map[string]string{
-	defaultColor: resetColor,
+	defaultColor: colorReset,
 	redColor:     colorRed,
 	greenColor:   colorGreen,
 	yellowColor:  colorYellow,
@@ -25,7 +25,7 @@ var colors = map[string]string{
 }
 
 var backgroundColors = map[string]string{
-	defaultColor: resetColor,
+	defaultColor: colorReset,
 	redColor:     backgroundRed,
 	greenColor:   backgroundGreen,
 	yellowColor:  backgroundYellow,
@@ -43,7 +43,7 @@ func IsValidTrueColor(color int) bool {
 
 // NewColor set the color of the text using a string as identifiers
 func NewColor(color *string) Color {
-	code := resetColor
+	code := colorReset
 	colorCode := colors[*color]
 	if colorCode != "" {
 		code = "\033[" + colorCode + "m"
@@ -53,7 +53,7 @@ func NewColor(color *string) Color {
 
 // NewColorRGB set the color of the text using RGB Notations
 func NewColorRGB(red int, green int, blue int) Color {
-	code := resetColor
+	code := colorReset
 	if IsValidTrueColor(red) && IsValidTrueColor(green) && IsValidTrueColor(blue) {
 		code = "\033[38;2;" + strconv.Itoa(red) + ";" + strconv.Itoa(green) + ";" + strconv.Itoa(blue) + "m"
 	}
@@ -62,7 +62,7 @@ func NewColorRGB(red int, green int, blue int) Color {
 
 // Background set the background using a string as identifiers
 func Background(color *string) Color {
-	code := resetColor
+	code := colorReset
 	colorCode := backgroundColors[*color]
 	if colorCode != "" {
 		code = "\033[" + colorCode + "m"
@@ -72,7 +72,7 @@ func Background(color *string) Color {
 
 // BackgroundRGB set the background using RGB Notations
 func BackgroundRGB(red int, green int, blue int) Color {
-	code := resetColor
+	code := colorReset
 	if IsValidTrueColor(red) && IsValidTrueColor(green) && IsValidTrueColor(blue) {
 		code = "\033[48;2;" + strconv.Itoa(red) + ";" + strconv.Itoa(green) + ";" + strconv.Itoa(blue) + "m"
 	}
@@ -96,7 +96,7 @@ func (c Color) ToCode() string {
 	if c.Code != nil {
 		return *c.Code
 	}
-	return resetColor
+	return colorReset
 }
 
 // EnableColors function enables colored logging
@@ -134,21 +134,38 @@ func SetErrorColor(color Color) {
 	colorMap[errorLabel] = color.ToCode()
 }
 
+// DetectColor return Color struct given a generic interface{}. It is an empty Color struct if not a valid type
+func DetectColor(color interface{}) Color {
+	empty := Color{}
+	switch color.(type) {
+	case *string:
+		return NewColor(color.(*string))
+	case Color:
+		if color != empty {
+			return color.(Color)
+		}
+		return empty
+	default:
+		return empty
+	}
+}
+
+// setCustomColors overrides defaultColor when custom color is passed into CustomColor configs
 func setCustomColors(colors CustomColors) {
-	var empty = Color{}
-	if colors.Trace != empty {
-		SetTraceColor(colors.Trace)
+	empty := Color{}
+	if traceColor := DetectColor(colors.Trace); traceColor != empty {
+		SetTraceColor(traceColor)
 	}
-	if colors.Debug != empty {
-		SetDebugColor(colors.Debug)
+	if debugColor := DetectColor(colors.Debug); debugColor != empty {
+		SetDebugColor(debugColor)
 	}
-	if colors.Info != empty {
-		SetInfoColor(colors.Info)
+	if infoColor := DetectColor(colors.Info); infoColor != empty {
+		SetInfoColor(infoColor)
 	}
-	if colors.Warn != empty {
-		SetWarnColor(colors.Warn)
+	if warnColor := DetectColor(colors.Warn); warnColor != empty {
+		SetWarnColor(warnColor)
 	}
-	if colors.Error != empty {
-		SetErrorColor(colors.Error)
+	if errorColor := DetectColor(colors.Error); errorColor != empty {
+		SetErrorColor(errorColor)
 	}
 }

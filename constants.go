@@ -25,7 +25,7 @@ const (
 	purpleColor  = "purple"
 	cyanColor    = "cyan"
 
-	resetColor = "\033[0m"
+	colorReset = "\033[0m"
 
 	colorRed    = "31"
 	colorGreen  = "32"

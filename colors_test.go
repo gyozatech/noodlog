@@ -227,8 +227,8 @@ func TestBackgroundRGBOnColor(t *testing.T) {
 
 func TestToCode(t *testing.T) {
 	empty := Color{}
-	if actual := empty.ToCode(); actual != resetColor {
-		t.Errorf("TestToCode failed for empty Color: got %s, expected %s", actual, resetColor)
+	if actual := empty.ToCode(); actual != colorReset {
+		t.Errorf("TestToCode failed for empty Color: got %s, expected %s", actual, colorReset)
 	}
 
 	existingCode := "code"
@@ -261,4 +261,27 @@ func TestSetWarnColor(t *testing.T) {
 
 func TestSetErrorColor(t *testing.T) {
 	//TODO
+}
+
+func TestDetectColor(t *testing.T) {
+	empty := Color{}
+	if actual := DetectColor(empty); actual != empty {
+		t.Errorf("TestDetectColor failed for empty Color: got %v, expected %v", actual, empty)
+	}
+
+	pointerOfString := Cyan
+	expectedColor := NewColor(Cyan)
+	if actual := DetectColor(pointerOfString); actual.ToCode() != expectedColor.ToCode() {
+		t.Errorf("TestDetectColor failed for pointer of a string: got %v, expected %v", actual, expectedColor)
+	}
+
+	wrongType := "string"
+	if actual := DetectColor(wrongType); actual != empty {
+		t.Errorf("TestDetectColor failed for invalidType: got %v, expected %v", actual, empty)
+	}
+
+	wrongContentPointer := &wrongType
+	if actual := DetectColor(wrongContentPointer); actual.ToCode() != colorReset {
+		t.Errorf("TestDetectColor failed for wrong color as type pointer of a string: got %v, expected %v", actual, colorReset)
+	}
 }

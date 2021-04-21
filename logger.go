@@ -162,7 +162,7 @@ func composeLog(level string, message []interface{}) string {
 
 	logRecord := string(jsn)
 	if colorEnabled {
-		logRecord = fmt.Sprintf("%s%s%s", colorMap[level], logRecord, resetColor)
+		logRecord = fmt.Sprintf("%s%s%s", colorMap[level], logRecord, colorReset)
 	}
 
 	return logRecord
