@@ -239,11 +239,11 @@ func TestSetErrorColor(t *testing.T) {
 	setColorAssertions("TestSetErrorColor", traceLabel, SetTraceColor, t)
 }
 
-func setColorAssertions(testName string, label string, setFunction func(color string), t *testing.T) {
+func setColorAssertions(testName string, label string, setFunction func(color Color), t *testing.T) {
 	errFormat := "%s failed: expected %s, found %s"
-	testMap := map[string]string{
-		blueColor:   colorBlue,
-		purpleColor: colorPurple,
+	testMap := map[Color]string{
+		NewColor(Blue):   composeColor(colorBlue),
+		NewColor(Purple): composeColor(colorPurple),
 	}
 	for color, colorCode := range testMap {
 		setFunction(color)
@@ -276,6 +276,10 @@ func TestDetectColor(t *testing.T) {
 	}
 }
 
+func composeColor(color string) string {
+	return "\033[" + color + "m"
+}
+
 func TestSetCustomColors(t *testing.T) {
 	errFormat := "TestSetCustomColors failed: expected %s got %s"
 
@@ -287,19 +291,19 @@ func TestSetCustomColors(t *testing.T) {
 		Error: Default,
 	})
 
-	if colorMap[traceLabel] != colorBlue {
-		t.Errorf(errFormat, blueColor, colorMap[traceLabel])
+	if blueCode := composeColor(colorBlue); colorMap[traceLabel] != blueCode {
+		t.Errorf(errFormat, blueCode, colorMap[traceLabel])
 	}
-	if colorMap[debugLabel] != colorPurple {
-		t.Errorf(errFormat, purpleColor, colorMap[debugLabel])
+	if purpleCode := composeColor(colorPurple); colorMap[debugLabel] != purpleCode {
+		t.Errorf(errFormat, purpleCode, colorMap[debugLabel])
 	}
-	if colorMap[infoLabel] != colorYellow {
-		t.Errorf(errFormat, yellowColor, colorMap[infoLabel])
+	if yellowCode := composeColor(colorYellow); colorMap[infoLabel] != yellowCode {
+		t.Errorf(errFormat, yellowCode, colorMap[infoLabel])
 	}
-	if colorMap[warnLabel] != colorGreen {
-		t.Errorf(errFormat, greenColor, colorMap[warnLabel])
+	if greenCode := composeColor(colorGreen); colorMap[warnLabel] != greenCode {
+		t.Errorf(errFormat, greenCode, colorMap[warnLabel])
 	}
-	if colorMap[errorLabel] != colorReset {
-		t.Errorf(errFormat, defaultColor, colorMap[errorLabel])
+	if defaultCode := composeColor(colorReset); colorMap[errorLabel] != defaultCode {
+		t.Errorf(errFormat, defaultCode, colorMap[errorLabel])
 	}
 }

@@ -87,20 +87,20 @@ func TestSetConfigsFullObject(t *testing.T) {
 	if !colorEnabled {
 		t.Errorf(errFormat, "colorEnabled", true, colorEnabled)
 	}
-	if colorMap[traceLabel] != colorPurple {
-		t.Errorf(errFormat, "colorMap[traceLabel]", colorPurple, colorMap[traceLabel])
+	if purpleCode := composeColor(colorPurple); colorMap[traceLabel] != purpleCode {
+		t.Errorf(errFormat, "colorMap[traceLabel]", purpleCode, colorMap[traceLabel])
 	}
-	if colorMap[debugLabel] != colorYellow {
-		t.Errorf(errFormat, "colorMap[debugLabel]", colorYellow, colorMap[debugLabel])
+	if yellowCode := composeColor(colorYellow); colorMap[debugLabel] != yellowCode {
+		t.Errorf(errFormat, "colorMap[debugLabel]", yellowCode, colorMap[debugLabel])
 	}
-	if colorMap[infoLabel] != colorRed {
-		t.Errorf(errFormat, "colorMap[infoLabel]", colorRed, colorMap[infoLabel])
+	if redCode := composeColor(colorRed); colorMap[infoLabel] != redCode {
+		t.Errorf(errFormat, "colorMap[infoLabel]", redCode, colorMap[infoLabel])
 	}
-	if colorMap[warnLabel] != colorBlue {
-		t.Errorf(errFormat, "colorMap[warnLabel]", colorBlue, colorMap[warnLabel])
+	if blueCode := composeColor(colorBlue); colorMap[warnLabel] != blueCode {
+		t.Errorf(errFormat, "colorMap[warnLabel]", blueCode, colorMap[warnLabel])
 	}
-	if colorMap[errorLabel] != colorCyan {
-		t.Errorf(errFormat, "colorMap[errorLabel]", colorCyan, colorMap[errorLabel])
+	if cyanCode := composeColor(colorCyan); colorMap[errorLabel] != cyanCode {
+		t.Errorf(errFormat, "colorMap[errorLabel]", cyanCode, colorMap[errorLabel])
 	}
 	if !obscureSensitiveDataEnabled {
 		t.Errorf(errFormat, "obscureSensitiveDataEnabled", true, obscureSensitiveDataEnabled)
