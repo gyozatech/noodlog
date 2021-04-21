@@ -21,5 +21,10 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+    - name: Run coverage
+      run: |
+        make check-coverage
+
+    - name: Upload coverage to Codecov
+      run: |
+        CODECOV_NAME=coverage.out bash <(curl -s https://codecov.io/bash)
