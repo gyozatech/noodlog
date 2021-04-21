@@ -5,6 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/gyozatech/noodlog)](https://goreportcard.com/report/github.com/gyozatech/noodlog)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 [![made-with-Go](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)](http://golang.org)
+[![codecov](https://codecov.io/gh/gyozatech/noodlog/branch/main/graph/badge.svg?token=7V3XRVR58L)](https://codecov.io/gh/gyozatech/noodlog)
 [![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 ![alt text](assets/noodlogo.png?raw=true)
