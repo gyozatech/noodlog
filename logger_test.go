@@ -153,11 +153,11 @@ var testsuite = []struct {
 func TestSimpleLogger(t *testing.T) {
 
 	var b bytes.Buffer
-	LogWriter(&b)                        // we want to write log in memory
-	SetConfigs(Configs{Colors: Disable}) // we don't want any ANSI sequence in the strings
+	LogWriter(&b)                                             // we want to write log in memory
+	SetConfigs(Configs{LogLevel: LevelInfo, Colors: Disable}) // we don't want any ANSI sequence in the strings
 
 	for _, tt := range testsuite {
-		b.Reset()
+		b.Reset() // clears the buffer for the next log message
 		Info(tt.in)
 		if !strings.Contains(b.String(), tt.expected) {
 			t.Errorf("Failed Test logger! Expected: %v, got: %v", tt.expected, b.String())
