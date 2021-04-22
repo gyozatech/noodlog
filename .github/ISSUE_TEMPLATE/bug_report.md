@@ -5,7 +5,7 @@ about: Tell us about a problem you are experiencing
 
 **Bug description**
 
-<!-- A clear and concise description of the feature. -->
+<!-- A clear and concise description of the bug. -->
 
 **How to reproduce**
 
@@ -13,9 +13,8 @@ about: Tell us about a problem you are experiencing
 
 **Environment**
 
-- Kannon version:
-- Kubernetes version (`kubectl version`):
-- OS:
+- Go version (`go version`):
+- OS and Architecture:
 
 **Anything else**
 
