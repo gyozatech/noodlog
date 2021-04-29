@@ -38,3 +38,14 @@ func traceCaller() (file, function string) {
 	return fmt.Sprintf("%s:%d", frame.File, frame.Line),
 		frame.Function
 }
+
+// traceCall static functions retrieves the filename of the function which wants to log
+func traceCall(traceCallerLevel int) (file, function string) {
+	pc := make([]uintptr, 15)
+	n := runtime.Callers(traceCallerLevel, pc)
+	frames := runtime.CallersFrames(pc[:n])
+	frame, _ := frames.Next()
+
+	return fmt.Sprintf("%s:%d", frame.File, frame.Line),
+		frame.Function
+}

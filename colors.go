@@ -168,4 +168,5 @@ func setCustomColors(colors CustomColors) {
 	if errorColor := DetectColor(colors.Error); errorColor != empty {
 		SetErrorColor(errorColor)
 	}
+
 }

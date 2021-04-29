@@ -1,5 +1,7 @@
 package noodlog
 
+import "io"
+
 // record struct represents the schema for every log record
 type record struct {
 	Level    string      `json:"level,omitempty"`
@@ -12,6 +14,7 @@ type record struct {
 // Configs struct contains all possible configs for noodlog
 type Configs struct {
 	LogLevel             *string
+	LogWriter            io.Writer
 	JSONPrettyPrint      *bool
 	TraceCaller          *bool
 	SinglePointTracing   *bool
