@@ -223,7 +223,7 @@ func (l *Logger) composeLog(level string, message []interface{}) string {
 
 	logMsg := record{
 		Level:   level,
-		Message: composeMessage(message),
+		Message: l.composeMessage(message),
 		Time:    strings.Split(time.Now().String(), "m")[0],
 	}
 
@@ -246,6 +246,49 @@ func (l *Logger) composeLog(level string, message []interface{}) string {
 	}
 
 	return logRecord
+}
+
+func (l *Logger) composeMessage(message []interface{}) interface{} {
+	switch len(message) {
+	case 0:
+		return ""
+	case 1:
+		return l.adaptMessage(message[0])
+	default:
+		switch message[0].(type) {
+		case string:
+			msg0 := message[0].(string)
+			if strings.Contains(msg0, "%") {
+				return fmt.Sprintf(msg0, message[1:]...)
+			}
+		}
+		return stringify(message)
+	}
+}
+
+func (l *Logger) adaptMessage(message interface{}) interface{} {
+	switch message.(type) {
+	case string:
+		strMsg := message.(string)
+		if l.obscureSensitiveData && len(l.sensitiveParams) != 0 {
+			return strToObj(obscureParams(strMsg, l.sensitiveParams))
+		}
+		return strToObj(strMsg)
+	default:
+		if l.obscureSensitiveData && len(l.sensitiveParams) != 0 {
+			jsn, _ := json.Marshal(message)
+			strMsg := obscureParams(string(jsn), l.sensitiveParams)
+			return strToObj(strMsg)
+		}
+	}
+	return message
+}
+
+func obscureParams(jsn string, sensitiveParams []string) string {
+	for _, param := range sensitiveParams {
+		jsn = obscureParam(jsn, param)
+	}
+	return jsn
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~``
