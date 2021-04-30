@@ -1,11 +1,5 @@
 package noodlog
 
-import (
-	"bytes"
-	"strings"
-	"testing"
-)
-
 /*func TestSetConfigsEmptyObject(t *testing.T) {
 
 	errFormat := "TestSetConfigsEmptyObject failed: param %s expected %v, got %v"
@@ -50,7 +44,7 @@ import (
 	}
 }*/
 
-func TestSetConfigsFullObject(t *testing.T) {
+/*func TestSetConfigsFullObject(t *testing.T) {
 
 	sensitiveList := []string{"password", "age"}
 	errFormat := "TestSetConfigsFullObject failed: param %s expected %v, got %v"
@@ -108,9 +102,9 @@ func TestSetConfigsFullObject(t *testing.T) {
 	if len(sensitiveParams) != 2 {
 		t.Errorf(errFormat, "sensitiveParams", 2, len(sensitiveParams))
 	}
-}
+}*/
 
-func TestLogLevel(t *testing.T) {
+/*func TestLogLevel(t *testing.T) {
 	testMap := map[string]int{
 		"trace":       1,
 		"debug":       2,
@@ -163,7 +157,7 @@ func TestSimpleLogger(t *testing.T) {
 			t.Errorf("Failed Test logger! Expected: %v, got: %v", tt.expected, b.String())
 		}
 	}
-}
+}*/
 
 //TestEnableDisableObscureSensitiveData
 

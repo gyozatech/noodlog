@@ -36,13 +36,13 @@ func TestNewColor(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		yellowColor:    Color{Code: &yellowCode},
-		blueColor:      Color{Code: &blueCode},
-		purpleColor:    Color{Code: &purpleCode},
-		cyanColor:      Color{Code: &cyanCode},
-		"invalidColor": Color{Code: &resetCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		yellowColor:    {Code: &yellowCode},
+		blueColor:      {Code: &blueCode},
+		purpleColor:    {Code: &purpleCode},
+		cyanColor:      {Code: &cyanCode},
+		"invalidColor": {Code: &resetCode},
 	}
 
 	for label, expected := range testData {
@@ -64,11 +64,11 @@ func TestNewColorRGB(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		blueColor:      Color{Code: &blueCode},
-		"mixedColor":   Color{Code: &mixedCode},
-		"invalidColor": Color{Code: &invalidCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		blueColor:      {Code: &blueCode},
+		"mixedColor":   {Code: &mixedCode},
+		"invalidColor": {Code: &invalidCode},
 	}
 
 	if actual := NewColorRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
@@ -104,13 +104,13 @@ func TestBackground(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		yellowColor:    Color{Code: &yellowCode},
-		blueColor:      Color{Code: &blueCode},
-		purpleColor:    Color{Code: &purpleCode},
-		cyanColor:      Color{Code: &cyanCode},
-		"invalidColor": Color{Code: &resetCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		yellowColor:    {Code: &yellowCode},
+		blueColor:      {Code: &blueCode},
+		purpleColor:    {Code: &purpleCode},
+		cyanColor:      {Code: &cyanCode},
+		"invalidColor": {Code: &resetCode},
 	}
 
 	for label, expected := range testData {
@@ -132,11 +132,11 @@ func TestBackgroundRGB(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		blueColor:      Color{Code: &blueCode},
-		"mixedColor":   Color{Code: &mixedCode},
-		"invalidColor": Color{Code: &invalidCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		blueColor:      {Code: &blueCode},
+		"mixedColor":   {Code: &mixedCode},
+		"invalidColor": {Code: &invalidCode},
 	}
 
 	if actual := BackgroundRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
@@ -188,13 +188,13 @@ func TestBackgroundOnColor(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		yellowColor:    Color{Code: &yellowCode},
-		blueColor:      Color{Code: &blueCode},
-		purpleColor:    Color{Code: &purpleCode},
-		cyanColor:      Color{Code: &cyanCode},
-		"invalidColor": Color{Code: &resetCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		yellowColor:    {Code: &yellowCode},
+		blueColor:      {Code: &blueCode},
+		purpleColor:    {Code: &purpleCode},
+		cyanColor:      {Code: &cyanCode},
+		"invalidColor": {Code: &resetCode},
 	}
 
 	var existingCode = "code"
