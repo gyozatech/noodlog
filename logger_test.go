@@ -1,5 +1,76 @@
 package noodlog
 
+import (
+	"fmt"
+	"os"
+	"testing"
+)
+
+var defaultLogger = Logger{
+	level:                infoLevel,
+	logWriter:            os.Stdout,
+	prettyPrint:          false,
+	traceCaller:          false,
+	traceCallerLevel:     5,
+	obscureSensitiveData: false,
+	sensitiveParams:      nil,
+	colors:               false,
+	colorMap:             colorMap,
+}
+
+var customLogger = Logger{
+	level:                errorLevel,
+	logWriter:            os.Stderr,
+	prettyPrint:          true,
+	traceCaller:          true,
+	traceCallerLevel:     6,
+	obscureSensitiveData: true,
+	sensitiveParams:      []string{"password"},
+	colors:               true,
+	colorMap:             colorMap,
+}
+
+func toStr(obj interface{}) string {
+	return fmt.Sprintf("%v", obj)
+}
+
+func TestNewLogger(t *testing.T) {
+
+	expected := toStr(defaultLogger)
+	actual := toStr(*NewLogger())
+
+	if actual != expected {
+		t.Errorf("TestNewLogger failed: expected %s, got %s", expected, actual)
+	}
+}
+
+func TestSetConfigsEmptyConfigs(t *testing.T) {
+	expected := toStr(defaultLogger)
+	actual := toStr(*NewLogger().SetConfigs(Configs{}))
+
+	if actual != expected {
+		t.Errorf("TestSetConfigsEmptyConfigs failed: expected %s, got %s", expected, actual)
+	}
+}
+
+func TestSetConfigsFullConfigs(t *testing.T) {
+	expected := toStr(customLogger)
+	actual := toStr(*NewLogger().SetConfigs(Configs{
+		LogLevel:             LevelError,
+		LogWriter:            os.Stderr,
+		JSONPrettyPrint:      Enable,
+		TraceCaller:          Enable,
+		SinglePointTracing:   Enable,
+		Colors:               Enable,
+		ObscureSensitiveData: Enable,
+		SensitiveParams:      []string{"password"},
+	}))
+
+	if actual != expected {
+		t.Errorf("TestSetConfigsFullConfigs failed: expected %s, got %s", expected, actual)
+	}
+}
+
 /*func TestSetConfigsEmptyObject(t *testing.T) {
 
 	errFormat := "TestSetConfigsEmptyObject failed: param %s expected %v, got %v"

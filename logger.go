@@ -37,7 +37,7 @@ func NewLogger() *Logger {
 	}
 }
 
-// SetConfigs function allows you to add all the configs at once
+// SetConfigs function allows you to rewrite all the configs at once
 func (l *Logger) SetConfigs(configs Configs) *Logger {
 	if configs.LogLevel != nil {
 		l.Level(*configs.LogLevel)
