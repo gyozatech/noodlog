@@ -2,7 +2,9 @@ package noodlog
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -68,6 +70,117 @@ func TestSetConfigsFullConfigs(t *testing.T) {
 
 	if actual != expected {
 		t.Errorf("TestSetConfigsFullConfigs failed: expected %s, got %s", expected, actual)
+	}
+}
+
+func TestLevel(t *testing.T) {
+	l := NewLogger()
+	testMap := map[string]int{
+		traceLabel: traceLevel,
+		infoLabel:  infoLevel,
+		warnLabel:  warnLevel,
+		errorLabel: errorLevel,
+		panicLabel: panicLevel,
+		fatalLabel: fatalLevel,
+	}
+
+	for input, expected := range testMap {
+		if l.Level(input).level != expected {
+			t.Errorf("TestLevel failed: expected level %d, got %d", expected, l.level)
+		}
+	}
+}
+
+func TestLogWriter(t *testing.T) {
+	l := NewLogger()
+	testSlice := []io.Writer{
+		os.Stdin,
+		os.Stdout,
+		os.Stderr,
+	}
+
+	for _, expected := range testSlice {
+		if l.LogWriter(expected).logWriter != expected {
+			t.Errorf("TestLogWriter failed: expected logWriter %d, got %d", expected, l.logWriter)
+		}
+	}
+}
+
+func TestEnableDisableJSONPrettyPrint(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableJSONPrettyPrint failed: expected prettyPrint %t, got %t"
+	if !l.EnableJSONPrettyPrint().prettyPrint {
+		t.Errorf(errFormat, true, l.prettyPrint)
+	}
+	if l.DisableJSONPrettyPrint().prettyPrint {
+		t.Errorf(errFormat, false, l.prettyPrint)
+	}
+}
+
+func TestEnableDisableTraceCaller(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableTraceCaller failed: expected traceCaller %t, got %t"
+	if !l.EnableTraceCaller().traceCaller {
+		t.Errorf(errFormat, true, l.traceCaller)
+	}
+	if l.DisableTraceCaller().traceCaller {
+		t.Errorf(errFormat, false, l.traceCaller)
+	}
+}
+
+func TestEnableDisableSinglePointTracing(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableSinglePointTracing failed: expected traceCallerLevel %d, got %d"
+	if l.EnableSinglePointTracing().traceCallerLevel != 6 {
+		t.Errorf(errFormat, 6, l.traceCallerLevel)
+	}
+	if l.DisableSinglePointTracing().traceCallerLevel != 5 {
+		t.Errorf(errFormat, 5, l.traceCallerLevel)
+	}
+}
+
+func TestEnableDisableLoggerColors(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableLoggerColors failed: expected colors %t, got %t"
+	if !l.EnableColors().colors {
+		t.Errorf(errFormat, true, l.colors)
+	}
+	if l.DisableColors().colors {
+		t.Errorf(errFormat, false, l.colors)
+	}
+}
+
+func TestEnableDisableObscureSensitiveParams(t *testing.T) {
+
+	params := []string{"password", "age"}
+	errFormat := "TestEnableDisableObscureSensitiveParams failed: expected obscureSensitiveData %t, got %t"
+
+	l := NewLogger()
+	l.EnableObscureSensitiveData(params)
+
+	if !l.obscureSensitiveData {
+		t.Errorf(errFormat, true, l.obscureSensitiveData)
+	}
+	if !reflect.DeepEqual(l.sensitiveParams, params) {
+		t.Errorf("TestEnableDisableObscureSensitiveParams failed: expected sensitiveParams %v. got %v", params, l.sensitiveParams)
+	}
+
+	l.DisableObscureSensitiveData()
+	if l.obscureSensitiveData {
+		t.Errorf(errFormat, false, l.obscureSensitiveData)
+	}
+}
+
+func TestSetSensitiveParams(t *testing.T) {
+
+	params := []string{"secret", "privatekey"}
+	errFormat := "TestEnableDisableObscureSensitiveParams failed: expected sensitiveParams %v. got %v"
+
+	l := NewLogger()
+	l.EnableObscureSensitiveData(params)
+
+	if !reflect.DeepEqual(l.SetSensitiveParams(params).sensitiveParams, params) {
+		t.Errorf(errFormat, params, l.sensitiveParams)
 	}
 }
 

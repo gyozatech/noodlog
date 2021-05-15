@@ -127,12 +127,14 @@ func (l *Logger) DisableTraceCaller() *Logger {
 
 // EnableSinglePointTracing function enables tracing the caller when setting the logger in a single package for the whole project and recalling the logging for the project from that single point for the specified logger instance
 func (l *Logger) EnableSinglePointTracing() *Logger {
+	l.traceCaller = true
 	l.traceCallerLevel = 6
 	return l
 }
 
 // DisableSinglePointTracing function trace function and filename of the directl caller
 func (l *Logger) DisableSinglePointTracing() *Logger {
+	l.traceCaller = true
 	l.traceCallerLevel = 5
 	return l
 }
@@ -145,7 +147,7 @@ func (l *Logger) EnableColors() *Logger {
 
 // DisableColors function let you disable colored logs for a specified logger
 func (l *Logger) DisableColors() *Logger {
-	l.colors = true
+	l.colors = false
 	return l
 }
 
