@@ -1,10 +1,12 @@
 package noodlog
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -181,6 +183,35 @@ func TestSetSensitiveParams(t *testing.T) {
 
 	if !reflect.DeepEqual(l.SetSensitiveParams(params).sensitiveParams, params) {
 		t.Errorf(errFormat, params, l.sensitiveParams)
+	}
+}
+
+type account struct {
+	Username string `json="username"`
+	Password string `json="password"`
+}
+
+var testLoggingMap = map[interface{}]string{
+	"hello": `"level":"%s","message":"hello"`,
+	`{"name": "gyoza", "cool": true, "password": "Sup3rS3cr3t"}`: `"level":"%s","message":{"name":"gyoza","cool":true,"password":"**********"}`,
+	"{\"name\": \"gyozatech\", \"repo\": \"noodlog\"}":           `"level":"%s","message":{"name":"gyozatech","repo":"noodlog"}`,
+	account{"gyozatech", "Sup3rS3cr3t"}:                          `"level":"%s","message":{"username":"gyozatech","password":"**********"}`,
+}
+
+func TestInfoLogging(t *testing.T) {
+
+	var b bytes.Buffer
+	b.Reset()
+	l := NewLogger().EnableObscureSensitiveData([]string{"password"}).LogWriter(&b)
+
+	for input, expectedFmt := range testLoggingMap {
+		l.Info(input)
+		actual := b.String()
+		expected := fmt.Sprintf(expectedFmt, "info")
+		if strings.Contains(actual, expected) {
+			t.Errorf("TestInfoLogging failed: expected %s, got %s", expected, actual)
+		}
+		b.Reset()
 	}
 }
 
