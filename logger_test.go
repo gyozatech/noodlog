@@ -187,8 +187,8 @@ func TestSetSensitiveParams(t *testing.T) {
 }
 
 type account struct {
-	Username string `json="username"`
-	Password string `json="password"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 var testLoggingMap = map[interface{}]string{
@@ -208,7 +208,7 @@ func TestInfoLogging(t *testing.T) {
 		l.Info(input)
 		actual := b.String()
 		expected := fmt.Sprintf(expectedFmt, "info")
-		if strings.Contains(actual, expected) {
+		if !strings.Contains(actual, expected) {
 			t.Errorf("TestInfoLogging failed: expected %s, got %s", expected, actual)
 		}
 		b.Reset()
