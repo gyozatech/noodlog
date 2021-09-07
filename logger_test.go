@@ -11,6 +11,8 @@ import (
 	"testing"
 )
 
+var errorFmt string = "%s failed: expected %v, got %v"
+
 var defaultLogger = Logger{
 	level:                infoLevel,
 	logWriter:            os.Stdout,
@@ -63,7 +65,7 @@ func TestNewLogger(t *testing.T) {
 	actual := toStr(*NewLogger())
 
 	if actual != expected {
-		t.Errorf("TestNewLogger failed: expected %s, got %s", expected, actual)
+		t.Errorf(errorFmt, "TestNewLogger", expected, actual)
 	}
 }
 
@@ -72,11 +74,11 @@ func TestSetConfigsEmptyConfigs(t *testing.T) {
 	actual := toStr(*NewLogger().SetConfigs(Configs{}))
 
 	if actual != expected {
-		t.Errorf("TestSetConfigsEmptyConfigs failed: expected %s, got %s", expected, actual)
+		t.Errorf(errorFmt, "TestSetConfigsEmptyConfigs", expected, actual)
 	}
 }
 
-func TestSetConfigsFullConfigs(t *testing.T) {
+func TestSetConfigsFullConfigsAllEnabled(t *testing.T) {
 	expected := toStr(customLogger)
 	actual := toStr(*NewLogger().SetConfigs(Configs{
 		LogLevel:             LevelError,
@@ -90,7 +92,32 @@ func TestSetConfigsFullConfigs(t *testing.T) {
 	}))
 
 	if actual != expected {
-		t.Errorf("TestSetConfigsFullConfigs failed: expected %s, got %s", expected, actual)
+		t.Errorf(errorFmt, "TestSetConfigsFullConfigsAllEnabled", expected, actual)
+	}
+}
+
+func TestSetConfigsFullConfigsAllDisabled(t *testing.T) {
+	customLogger.obscureSensitiveData = false
+	customLogger.prettyPrint = false
+	customLogger.colors = false
+	customLogger.traceCaller = false
+	customLogger.traceCallerLevel = 5
+	customLogger.obscureSensitiveData = false
+
+	expected := toStr(customLogger)
+	actual := toStr(*NewLogger().SetConfigs(Configs{
+		LogLevel:             LevelError,
+		LogWriter:            os.Stderr,
+		JSONPrettyPrint:      Disable,
+		TraceCaller:          Disable,
+		SinglePointTracing:   Disable,
+		Colors:               Disable,
+		ObscureSensitiveData: Disable,
+		SensitiveParams:      []string{"password"},
+	}))
+
+	if actual != expected {
+		t.Errorf(errorFmt, "TestSetConfigsFullConfigsAllDisabled", expected, actual)
 	}
 }
 
@@ -107,7 +134,7 @@ func TestLevel(t *testing.T) {
 
 	for input, expected := range testMap {
 		if l.Level(input).level != expected {
-			t.Errorf("TestLevel failed: expected level %d, got %d", expected, l.level)
+			t.Errorf(errorFmt, "TestLevel", expected, l.level)
 		}
 	}
 }
@@ -122,7 +149,7 @@ func TestLogWriter(t *testing.T) {
 
 	for _, expected := range testSlice {
 		if l.LogWriter(expected).logWriter != expected {
-			t.Errorf("TestLogWriter failed: expected logWriter %d, got %d", expected, l.logWriter)
+			t.Errorf(errorFmt, "TestLogWriter", expected, l.logWriter)
 		}
 	}
 }
@@ -130,6 +157,7 @@ func TestLogWriter(t *testing.T) {
 func TestEnableDisableJSONPrettyPrint(t *testing.T) {
 	l := NewLogger()
 	errFormat := "TestEnableDisableJSONPrettyPrint failed: expected prettyPrint %t, got %t"
+
 	if !l.EnableJSONPrettyPrint().prettyPrint {
 		t.Errorf(errFormat, true, l.prettyPrint)
 	}
@@ -141,6 +169,7 @@ func TestEnableDisableJSONPrettyPrint(t *testing.T) {
 func TestEnableDisableTraceCaller(t *testing.T) {
 	l := NewLogger()
 	errFormat := "TestEnableDisableTraceCaller failed: expected traceCaller %t, got %t"
+
 	if !l.EnableTraceCaller().traceCaller {
 		t.Errorf(errFormat, true, l.traceCaller)
 	}
@@ -152,6 +181,7 @@ func TestEnableDisableTraceCaller(t *testing.T) {
 func TestEnableDisableSinglePointTracing(t *testing.T) {
 	l := NewLogger()
 	errFormat := "TestEnableDisableSinglePointTracing failed: expected traceCallerLevel %d, got %d"
+
 	if l.EnableSinglePointTracing().traceCallerLevel != 6 {
 		t.Errorf(errFormat, 6, l.traceCallerLevel)
 	}
@@ -163,6 +193,7 @@ func TestEnableDisableSinglePointTracing(t *testing.T) {
 func TestEnableDisableLoggerColors(t *testing.T) {
 	l := NewLogger()
 	errFormat := "TestEnableDisableLoggerColors failed: expected colors %t, got %t"
+
 	if !l.EnableColors().colors {
 		t.Errorf(errFormat, true, l.colors)
 	}
@@ -210,28 +241,89 @@ type account struct {
 	Password string `json:"password"`
 }
 
-var testLoggingMap = map[interface{}]string{
-	"hello": `"level":"%s","message":"hello"`,
-	`{"name": "gyoza", "cool": true, "password": "Sup3rS3cr3t"}`: `"level":"%s","message":{"cool":true,"name":"gyoza","password":"**********"}`,
-	"{\"name\": \"gyozatech\", \"repo\": \"noodlog\"}":           `"level":"%s","message":{"name":"gyozatech","repo":"noodlog"}`,
-	account{"gyozatech", "Sup3rS3cr3t"}:                          `"level":"%s","message":{"password":"**********","username":"gyozatech"}`,
-}
-
 func TestInfoLogging(t *testing.T) {
+
+	var testLoggingMap = map[interface{}]string{
+		"":      `"level":"%s","message":""`,
+		"hello": `"level":"%s","message":"hello"`,
+		`{"name": "gyoza", "cool": true, "password": "Sup3rS3cr3t"}`: `"level":"%s","message":{"cool":true,"name":"gyoza","password":"**********"}`,
+		"{\"name\": \"gyozatech\", \"repo\": \"noodlog\"}":           `"level":"%s","message":{"name":"gyozatech","repo":"noodlog"}`,
+		account{"gyozatech", "Sup3rS3cr3t"}:                          `"level":"%s","message":{"password":"**********","username":"gyozatech"}`,
+	}
 
 	var b bytes.Buffer
 	b.Reset()
 	l := NewLogger().EnableObscureSensitiveData([]string{"password"}).LogWriter(&b)
 
 	for input, expectedFmt := range testLoggingMap {
-		l.Info(input)
+		if input != "" {
+			l.Info(input)
+		} else {
+			l.Info()
+		}
+
 		actual := b.String()
 		expected := fmt.Sprintf(expectedFmt, "info")
 		if !strings.Contains(actual, expected) {
-			t.Errorf("TestInfoLogging failed: expected %s, got %s", expected, actual)
+			t.Errorf(errorFmt, "TestInfoLogging", expected, actual)
 		}
 		b.Reset()
 	}
+}
+
+func TestLogging(t *testing.T) {
+
+	var b bytes.Buffer
+	b.Reset()
+	l := NewLogger().
+		EnableObscureSensitiveData([]string{"password"}).
+		EnableTraceCaller().
+		EnableColors().
+		LogWriter(&b)
+
+	for _, level := range []string{"trace", "debug", "info", "warn", "error"} {
+
+		input1 := "logging example"
+		input2 := "text"
+
+		input3 := "logging example %s"
+		input4 := "logging example text"
+
+		expected := `{"level":"*","message":"logging example text","time":"*"}`
+
+		switch level {
+		case "trace":
+			l.Trace(input1, input2)
+		case "debug":
+			l.Debug(input1, input2)
+		case "info":
+			l.Info(input1, input2)
+		case "warn":
+			l.DisableObscureSensitiveData()
+			l.Warn(input4)
+		case "error":
+			l.Error(input3, input2)
+		}
+
+		actual := b.String()
+
+		if level == "debug" || level == "trace" {
+			if actual != "" {
+				t.Errorf(errorFmt, "TestLogging", "", actual)
+			}
+		} else {
+			if !Matches(actual, expected) {
+				t.Errorf(errorFmt, "TestLogging", expected, actual)
+			}
+		}
+
+		b.Reset()
+
+	}
+}
+
+func TestAdaptMessage(t *testing.T) {
+
 }
 
 /*func TestSetConfigsEmptyObject(t *testing.T) {

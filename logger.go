@@ -134,7 +134,6 @@ func (l *Logger) EnableSinglePointTracing() *Logger {
 
 // DisableSinglePointTracing function trace function and filename of the directl caller
 func (l *Logger) DisableSinglePointTracing() *Logger {
-	l.traceCaller = true
 	l.traceCallerLevel = 5
 	return l
 }

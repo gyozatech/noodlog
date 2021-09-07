@@ -2,6 +2,7 @@ package noodlog
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -74,12 +75,12 @@ func TestStrToObj(t *testing.T) {
 	}
 }
 
-/*func TestTraceCaller(t *testing.T) {
+func TestTraceCaller(t *testing.T) {
 
 	errFormat := "TestTraceCaller failed: expected %s, got %s"
 
 	file, function := traceCaller(5)
-	expectedFile := ""
+	expectedFile := ":0"
 	expectedFunction := ""
 
 	if file != expectedFile {
@@ -89,10 +90,12 @@ func TestStrToObj(t *testing.T) {
 		t.Errorf(errFormat, expectedFunction, function)
 	}
 
-	file, function = caller1()
+	expectedFilePortion := "runtime"
+	expectedFunction = "runtime.goexit"
+	file, function = caller2()
 
-	if file != expectedFile {
-		t.Errorf(errFormat, expectedFile, file)
+	if !strings.Contains(file, expectedFilePortion) {
+		t.Errorf(errFormat, expectedFilePortion, file)
 	}
 	if function != expectedFunction {
 		t.Errorf(errFormat, expectedFunction, function)
@@ -102,4 +105,7 @@ func TestStrToObj(t *testing.T) {
 func caller1() (string, string) {
 	return traceCaller(6)
 }
-*/
+
+func caller2() (string, string) {
+	return caller1()
+}
