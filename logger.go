@@ -150,11 +150,52 @@ func (l *Logger) DisableColors() *Logger {
 	return l
 }
 
-// SetCustomColors function let you disable colored logs for a specified logger instance
+// SetCustomColors overrides defaultColor when custom color is passed into CustomColor configs
 func (l *Logger) SetCustomColors(colors CustomColors) *Logger {
-	// TODO
-	l.colorMap = colorMap
+
+	empty := Color{}
+	if traceColor := detectColor(colors.Trace); traceColor != empty {
+		l.SetTraceColor(traceColor)
+	}
+	if debugColor := detectColor(colors.Debug); debugColor != empty {
+		l.SetDebugColor(debugColor)
+	}
+	if infoColor := detectColor(colors.Info); infoColor != empty {
+		l.SetInfoColor(infoColor)
+	}
+	if warnColor := detectColor(colors.Warn); warnColor != empty {
+		l.SetWarnColor(warnColor)
+	}
+	if errorColor := detectColor(colors.Error); errorColor != empty {
+		l.SetErrorColor(errorColor)
+	}
+
 	return l
+}
+
+// SetTraceColor overrides the trace level log color with the one specified in input
+func (l *Logger) SetTraceColor(color Color) {
+	l.colorMap[traceLabel] = color.toCode()
+}
+
+// SetDebugColor overrides the debug level log color with the one specified in input
+func (l *Logger) SetDebugColor(color Color) {
+	l.colorMap[debugLabel] = color.toCode()
+}
+
+// SetInfoColor overrides the info level log color with the one specified in input
+func (l *Logger) SetInfoColor(color Color) {
+	l.colorMap[infoLabel] = color.toCode()
+}
+
+// SetWarnColor overrides the warn level log color with the one specified in input
+func (l *Logger) SetWarnColor(color Color) {
+	l.colorMap[warnLabel] = color.toCode()
+}
+
+// SetErrorColor overrides the error level log color with the one specified in input
+func (l *Logger) SetErrorColor(color Color) {
+	l.colorMap[errorLabel] = color.toCode()
 }
 
 // EnableObscureSensitiveData enables sensitive data obscuration from json logs for a given logger instance

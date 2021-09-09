@@ -322,10 +322,6 @@ func TestLogging(t *testing.T) {
 	}
 }
 
-func TestAdaptMessage(t *testing.T) {
-
-}
-
 /*func TestSetConfigsEmptyObject(t *testing.T) {
 
 	errFormat := "TestSetConfigsEmptyObject failed: param %s expected %v, got %v"
@@ -502,3 +498,98 @@ func TestSimpleLogger(t *testing.T) {
 //TestObscureSensitiveData
 
 //TestObscureParam
+
+func composeColor(color string) string {
+	return "\033[" + color + "m"
+}
+
+func TestSetCustomColors(t *testing.T) {
+	errFormat := "TestSetCustomColors failed: expected %s got %s"
+
+	l := NewLogger()
+
+	l.SetCustomColors(CustomColors{
+		Trace: Blue,
+		Debug: Purple,
+		Info:  Yellow,
+		Warn:  Green,
+		Error: Default,
+	})
+
+	if blueCode := composeColor(colorBlue); l.colorMap[traceLabel] != blueCode {
+		t.Errorf(errFormat, blueCode, l.colorMap[traceLabel])
+	}
+	if purpleCode := composeColor(colorPurple); l.colorMap[debugLabel] != purpleCode {
+		t.Errorf(errFormat, purpleCode, l.colorMap[debugLabel])
+	}
+	if yellowCode := composeColor(colorYellow); l.colorMap[infoLabel] != yellowCode {
+		t.Errorf(errFormat, yellowCode, l.colorMap[infoLabel])
+	}
+	if greenCode := composeColor(colorGreen); l.colorMap[warnLabel] != greenCode {
+		t.Errorf(errFormat, greenCode, l.colorMap[warnLabel])
+	}
+	if defaultCode := composeColor(colorReset); l.colorMap[errorLabel] != defaultCode {
+		t.Errorf(errFormat, defaultCode, l.colorMap[errorLabel])
+	}
+}
+
+var colorTestMap = map[Color]string{
+	NewColor(Blue):   composeColor(colorBlue),
+	NewColor(Purple): composeColor(colorPurple),
+}
+
+func TestSetTraceColor(t *testing.T) {
+	l := NewLogger()
+
+	for color, colorCode := range colorTestMap {
+		l.SetTraceColor(color)
+		if actualCode := l.colorMap[traceLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetTraceColor", colorCode, actualCode)
+		}
+	}
+}
+
+func TestSetDebugColor(t *testing.T) {
+	l := NewLogger()
+
+	for color, colorCode := range colorTestMap {
+		l.SetDebugColor(color)
+		if actualCode := l.colorMap[debugLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetDebugColor", colorCode, actualCode)
+		}
+	}
+}
+
+func TestSetInfoColor(t *testing.T) {
+
+	l := NewLogger()
+
+	for color, colorCode := range colorTestMap {
+		l.SetInfoColor(color)
+		if actualCode := l.colorMap[infoLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetInfoColor", colorCode, actualCode)
+		}
+	}
+}
+
+func TestSetWarnColor(t *testing.T) {
+	l := NewLogger()
+
+	for color, colorCode := range colorTestMap {
+		l.SetWarnColor(color)
+		if actualCode := l.colorMap[warnLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetWarnColor", colorCode, actualCode)
+		}
+	}
+}
+
+func TestSetErrorColor(t *testing.T) {
+	l := NewLogger()
+
+	for color, colorCode := range colorTestMap {
+		l.SetErrorColor(color)
+		if actualCode := l.colorMap[errorLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetErrorColor", colorCode, actualCode)
+		}
+	}
+}
