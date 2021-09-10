@@ -34,8 +34,8 @@ var backgroundColors = map[string]string{
 	cyanColor:    backgroundCyan,
 }
 
-// isValidTrueColor check if a true color is valid, it has to be included between 0 and 255
-func isValidTrueColor(color int) bool {
+// isValidColor check if a true color is valid, it has to be included between 0 and 255
+func isValidColor(color int) bool {
 	return color >= 0 && color <= 255
 }
 
@@ -52,7 +52,7 @@ func NewColor(color *string) Color {
 // NewColorRGB set the color of the text using RGB Notations
 func NewColorRGB(red int, green int, blue int) Color {
 	code := colorReset
-	if isValidTrueColor(red) && isValidTrueColor(green) && isValidTrueColor(blue) {
+	if isValidColor(red) && isValidColor(green) && isValidColor(blue) {
 		code = "\033[38;2;" + strconv.Itoa(red) + ";" + strconv.Itoa(green) + ";" + strconv.Itoa(blue) + "m"
 	}
 	return Color{Code: &code}
@@ -69,9 +69,9 @@ func Background(color *string) Color {
 }
 
 // BackgroundRGB set the background using RGB Notations
-func BackgroundRGB(red int, green int, blue int) Color {
+func backgroundRGB(red int, green int, blue int) Color {
 	code := colorReset
-	if isValidTrueColor(red) && isValidTrueColor(green) && isValidTrueColor(blue) {
+	if isValidColor(red) && isValidColor(green) && isValidColor(blue) {
 		code = "\033[48;2;" + strconv.Itoa(red) + ";" + strconv.Itoa(green) + ";" + strconv.Itoa(blue) + "m"
 	}
 	return Color{Code: &code}
@@ -85,7 +85,7 @@ func (c Color) Background(color *string) Color {
 
 // From a given Color it set the background using RGB Notations
 func (c Color) BackgroundRGB(red int, green int, blue int) Color {
-	code := *(c.Code) + *BackgroundRGB(red, green, blue).Code
+	code := *(c.Code) + *backgroundRGB(red, green, blue).Code
 	return Color{Code: &code}
 }
 
@@ -101,13 +101,14 @@ func (c Color) toCode() string {
 func detectColor(color interface{}) Color {
 	empty := Color{}
 	switch color.(type) {
-	case *string:
-		return NewColor(color.(*string))
 	case Color:
 		if color != empty {
 			return color.(Color)
 		}
 		return empty
+	case *string:
+		return NewColor(color.(*string))
+
 	default:
 		return empty
 	}

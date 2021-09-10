@@ -250,7 +250,9 @@ func (l *Logger) Panic(message ...interface{}) {
 // Fatal function prints a log with fatal log level
 func (l *Logger) Fatal(message ...interface{}) {
 	l.printLog(fatalLabel, message)
-	os.Exit(1)
+	if os.Getenv("EXIT_ON_FATAL_DISABLED") != "true" {
+		os.Exit(1)
+	}
 }
 
 func (l *Logger) printLog(label string, message []interface{}) {

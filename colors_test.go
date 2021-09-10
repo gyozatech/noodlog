@@ -24,22 +24,22 @@ var testData = map[string]Color{
 	"invalidColor": {Code: &resetCode},
 }
 
-func TestIsValidTrueColor(t *testing.T) {
-	errFormat := "TestIsValidTrueColor failed: expected true found %t"
+func TestIsValidColor(t *testing.T) {
+	errFormat := "TestIsValidColor failed: expected true found %t"
 
 	validColor := 255
 	negativeColor := -1
 	overflowColor := 256
 
-	if actual := isValidTrueColor(validColor); !actual {
+	if actual := isValidColor(validColor); !actual {
 		t.Errorf(errFormat, actual)
 	}
 
-	if actual := isValidTrueColor(negativeColor); actual {
+	if actual := isValidColor(negativeColor); actual {
 		t.Errorf(errFormat, actual)
 	}
 
-	if actual := isValidTrueColor(overflowColor); actual {
+	if actual := isValidColor(overflowColor); actual {
 		t.Errorf(errFormat, actual)
 	}
 }
@@ -159,23 +159,23 @@ func TestBackgroundRGB(t *testing.T) {
 		"invalidColor": {Code: &invalidCode},
 	}
 
-	if actual := BackgroundRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
+	if actual := backgroundRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
 		t.Errorf(errFormat, redColor, actual, testData[redColor])
 	}
 
-	if actual := BackgroundRGB(0, 255, 0); *actual.Code != *testData[greenColor].Code {
+	if actual := backgroundRGB(0, 255, 0); *actual.Code != *testData[greenColor].Code {
 		t.Errorf(errFormat, greenColor, actual, testData[greenColor])
 	}
 
-	if actual := BackgroundRGB(0, 0, 255); *actual.Code != *testData[blueColor].Code {
+	if actual := backgroundRGB(0, 0, 255); *actual.Code != *testData[blueColor].Code {
 		t.Errorf(errFormat, blueColor, actual, testData[blueColor])
 	}
 
-	if actual := BackgroundRGB(128, 128, 128); *actual.Code != *testData["mixedColor"].Code {
+	if actual := backgroundRGB(128, 128, 128); *actual.Code != *testData["mixedColor"].Code {
 		t.Errorf(errFormat, "mixedColor", actual, testData["mixedColor"])
 	}
 
-	if actual := BackgroundRGB(256, 0, 0); *actual.Code != *testData["invalidColor"].Code {
+	if actual := backgroundRGB(256, 0, 0); *actual.Code != *testData["invalidColor"].Code {
 		t.Errorf(errFormat, "invalidColor", actual, testData["invalidColor"])
 	}
 }
@@ -208,6 +208,16 @@ func TestBackgroundOnColor(t *testing.T) {
 	}
 }
 
+func TestBackgroundRGBOnColor(t *testing.T) {
+
+	expected := "\x1b[38;2;12;12;12m\x1b[48;2;255;255;255m"
+	actual := NewColorRGB(12, 12, 12).BackgroundRGB(255, 255, 255).toCode()
+
+	if expected != actual {
+		t.Errorf(errorFmt, "TestBackgroundRGBOnColor", expected, actual)
+	}
+}
+
 func TestDetectColor(t *testing.T) {
 	empty := Color{}
 	if actual := detectColor(empty); actual != empty {
@@ -218,6 +228,12 @@ func TestDetectColor(t *testing.T) {
 	expectedColor := NewColor(Cyan)
 	if actual := detectColor(pointerOfString); actual.toCode() != expectedColor.toCode() {
 		t.Errorf("TestDetectColor failed for pointer of a string: got %v, expected %v", actual, expectedColor)
+	}
+
+	inputColor := NewColor(Cyan)
+	expectedColor = NewColor(Cyan)
+	if actual := detectColor(inputColor); actual.toCode() != expectedColor.toCode() {
+		t.Errorf("TestDetectColor failed for non emptu Color object: got %v, expected %v", actual.toCode(), expectedColor.toCode())
 	}
 
 	wrongType := "string"
