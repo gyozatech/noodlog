@@ -46,18 +46,18 @@ Open `main.go` and paste the following code:
 package main
 
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
 
 func init() {
-   log.SetConfigs(
-      log.Configs{
-         LogLevel: log.LevelTrace,
-         JSONPrettyPrint: log.Enable,
-         TraceCaller: log.Enable,
-         Colors: log.Enable,
-         CustomColors: &log.CustomColors{ Trace: log.Cyan },
-         ObscureSensitiveData: log.Enable,
+   log := noodlog.NewLogger().SetConfigs(
+      noodlog.Configs{
+         LogLevel: noodlog.LevelTrace,
+         JSONPrettyPrint: noodlog.Enable,
+         TraceCaller: noodlog.Enable,
+         Colors: noodlog.Enable,
+         CustomColors: &noodlog.CustomColors{ Trace: noodlog.Cyan },
+         ObscureSensitiveData: noodlog.Enable,
          SensitiveParams: []string{"password"},
       },
     )
@@ -105,8 +105,14 @@ To set the logging level, after importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 you can use the facility method:
 
@@ -134,8 +140,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 **To enable** pretty printing of the JSON logs you can use:
@@ -148,7 +160,7 @@ or
 ```golang
 log.SetConfigs(
     log.Configs{
-    JSONPrettyPrint: log.Enable,
+       JSONPrettyPrint: log.Enable,
     },
 )
 ```
@@ -164,7 +176,7 @@ or
 ```golang
 log.SetConfigs(
     log.Configs{
-    JSONPrettyPrint: log.Disable,
+       JSONPrettyPrint: log.Disable,
     },
 )
 ```
@@ -180,8 +192,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 **to enable** colors in JSON logs you can use:
@@ -320,8 +338,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 **to enable** the trace caller you can use:
@@ -380,9 +404,12 @@ import (
     "github.com/gyozatech/noodlog"
 )
 
+var l *noodlog.Logger
+
 func init() {
+    l = NewLogger)()
     // configure logger once
-    noodlog.SetConfig(
+    l.SetConfig(
         noodlog.Configs{
          TraceCaller: noodlog.Enable,
          SinglePointTracing: noodlog.Enable,
@@ -394,7 +421,7 @@ func init() {
 func Info(message ...interface{}) {
     // if we wouldn't enable SinglePointTracing
     // logger.Info would have been considered the caller to be tracked
-    noodlog.Info(message...)
+    l.Info(message...)
 }
 ```
 
@@ -408,8 +435,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 You can **enable** the sensitive params obscuration with the facility methods:
@@ -453,7 +486,3 @@ The *default* value for the obscuration is _false_.
 To contribute to the project create a fork on your personal Github profile and open a pull request to the main branch of the project using the template specified here:
 
 (PR Template)[https://github.com/gyozatech/noodlog/blob/main/.github/PULL_REQUEST_TEMPLATE.md]
-
-
-## Benchmark
-
