@@ -2,183 +2,469 @@ package noodlog
 
 import (
 	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 )
 
-/*func TestSetConfigsEmptyObject(t *testing.T) {
+var errorFmt string = "%s failed: expected %v, got %v"
 
-	errFormat := "TestSetConfigsEmptyObject failed: param %s expected %v, got %v"
+var defaultLogger = Logger{
+	level:                infoLevel,
+	logWriter:            os.Stdout,
+	prettyPrint:          false,
+	traceCaller:          false,
+	traceCallerLevel:     5,
+	obscureSensitiveData: false,
+	sensitiveParams:      nil,
+	colors:               false,
+	colorMap:             colorMap,
+}
 
-	SetConfigs(Configs{})
+var customLogger = Logger{
+	level:                errorLevel,
+	logWriter:            os.Stderr,
+	prettyPrint:          true,
+	traceCaller:          true,
+	traceCallerLevel:     6,
+	obscureSensitiveData: true,
+	sensitiveParams:      []string{"password"},
+	colors:               true,
+	colorMap:             colorMap,
+}
 
-	if logLevel != 3 {
-		t.Errorf(errFormat, "logLevel", 5, logLevel)
-	}
-	if JSONPrettyPrint {
-		t.Errorf(errFormat, "JSONPrettyPrint", false, JSONPrettyPrint)
-	}
-	if traceCallerEnabled {
-		t.Errorf(errFormat, "traceCallerEnabled", false, traceCallerEnabled)
-	}
-	if traceCallerLevel != 5 {
-		t.Errorf(errFormat, "traceCallerLevel", 5, traceCallerLevel)
-	}
-	if colorEnabled {
-		t.Errorf(errFormat, "colorEnabled", false, colorEnabled)
-	}
-	if colorMap[traceLabel] != colorReset {
-		t.Errorf(errFormat, "colorMap[traceLabel]", colorReset, colorMap[traceLabel])
-	}
-	if colorMap[debugLabel] != colorGreen {
-		t.Errorf(errFormat, "colorMap[debugLabel]", colorGreen, colorMap[debugLabel])
-	}
-	if colorMap[infoLabel] != colorReset {
-		t.Errorf(errFormat, "colorMap[infoLabel]", colorReset, colorMap[infoLabel])
-	}
-	if colorMap[warnLabel] != colorYellow {
-		t.Errorf(errFormat, "colorMap[warnLabel]", colorYellow, colorMap[warnLabel])
-	}
-	if colorMap[errorLabel] != colorRed {
-		t.Errorf(errFormat, "colorMap[errorLabel]", colorRed, colorMap[errorLabel])
-	}
-	if obscureSensitiveDataEnabled {
-		t.Errorf(errFormat, "obscureSensitiveDataEnabled", false, obscureSensitiveDataEnabled)
-	}
-	if len(sensitiveParams) != 0 {
-		t.Errorf(errFormat, "sensitiveParams", 0, len(sensitiveParams))
-	}
-}*/
+func toStr(obj interface{}) string {
+	return fmt.Sprintf("%v", obj)
+}
 
-func TestSetConfigsFullObject(t *testing.T) {
+func wildCardToRegexp(pattern string) string {
+	var result strings.Builder
+	for i, literal := range strings.Split(pattern, "*") {
+		// Replace * with .*
+		if i > 0 {
+			result.WriteString(".*")
+		}
+		// Quote any regular expression meta characters in the literal text.
+		result.WriteString(regexp.QuoteMeta(literal))
+	}
+	return result.String()
+}
 
-	sensitiveList := []string{"password", "age"}
-	errFormat := "TestSetConfigsFullObject failed: param %s expected %v, got %v"
+func Matches(value string, pattern string) bool {
+	result, _ := regexp.MatchString(wildCardToRegexp(pattern), value)
+	return result
+}
 
-	SetConfigs(Configs{
-		LogLevel:           LevelError,
-		JSONPrettyPrint:    Enable,
-		TraceCaller:        Enable,
-		SinglePointTracing: Enable,
-		Colors:             Enable,
-		CustomColors: &CustomColors{
-			Trace: Purple,
-			Debug: Yellow,
-			Info:  Red,
-			Warn:  Blue,
-			Error: Cyan,
-		},
-		ObscureSensitiveData: Enable,
-		SensitiveParams:      sensitiveList,
-	})
+func TestNewLogger(t *testing.T) {
 
-	if logLevel != 5 {
-		t.Errorf(errFormat, "logLevel", 5, logLevel)
-	}
-	if !JSONPrettyPrint {
-		t.Errorf(errFormat, "JSONPrettyPrint", true, JSONPrettyPrint)
-	}
-	if !traceCallerEnabled {
-		t.Errorf(errFormat, "traceCallerEnabled", true, traceCallerEnabled)
-	}
-	if traceCallerLevel != 6 {
-		t.Errorf(errFormat, "traceCallerLevel", 6, traceCallerLevel)
-	}
-	if !colorEnabled {
-		t.Errorf(errFormat, "colorEnabled", true, colorEnabled)
-	}
-	if purpleCode := composeColor(colorPurple); colorMap[traceLabel] != purpleCode {
-		t.Errorf(errFormat, "colorMap[traceLabel]", purpleCode, colorMap[traceLabel])
-	}
-	if yellowCode := composeColor(colorYellow); colorMap[debugLabel] != yellowCode {
-		t.Errorf(errFormat, "colorMap[debugLabel]", yellowCode, colorMap[debugLabel])
-	}
-	if redCode := composeColor(colorRed); colorMap[infoLabel] != redCode {
-		t.Errorf(errFormat, "colorMap[infoLabel]", redCode, colorMap[infoLabel])
-	}
-	if blueCode := composeColor(colorBlue); colorMap[warnLabel] != blueCode {
-		t.Errorf(errFormat, "colorMap[warnLabel]", blueCode, colorMap[warnLabel])
-	}
-	if cyanCode := composeColor(colorCyan); colorMap[errorLabel] != cyanCode {
-		t.Errorf(errFormat, "colorMap[errorLabel]", cyanCode, colorMap[errorLabel])
-	}
-	if !obscureSensitiveDataEnabled {
-		t.Errorf(errFormat, "obscureSensitiveDataEnabled", true, obscureSensitiveDataEnabled)
-	}
-	if len(sensitiveParams) != 2 {
-		t.Errorf(errFormat, "sensitiveParams", 2, len(sensitiveParams))
+	expected := toStr(defaultLogger)
+	actual := toStr(*NewLogger())
+
+	if actual != expected {
+		t.Errorf(errorFmt, "TestNewLogger", expected, actual)
 	}
 }
 
-func TestLogLevel(t *testing.T) {
+func TestSetConfigsEmptyConfigs(t *testing.T) {
+	expected := toStr(defaultLogger)
+	actual := toStr(*NewLogger().SetConfigs(Configs{}))
+
+	if actual != expected {
+		t.Errorf(errorFmt, "TestSetConfigsEmptyConfigs", expected, actual)
+	}
+}
+
+func TestSetConfigsFullConfigsAllEnabled(t *testing.T) {
+	expected := toStr(customLogger)
+	actual := toStr(*NewLogger().SetConfigs(Configs{
+		LogLevel:             LevelError,
+		LogWriter:            os.Stderr,
+		JSONPrettyPrint:      Enable,
+		TraceCaller:          Enable,
+		SinglePointTracing:   Enable,
+		Colors:               Enable,
+		CustomColors:         &CustomColors{Trace: Color{}, Debug: Green},
+		ObscureSensitiveData: Enable,
+		SensitiveParams:      []string{"password"},
+	}))
+
+	if actual != expected {
+		t.Errorf(errorFmt, "TestSetConfigsFullConfigsAllEnabled", expected, actual)
+	}
+}
+
+func TestSetConfigsFullConfigsAllDisabled(t *testing.T) {
+	customLogger.obscureSensitiveData = false
+	customLogger.prettyPrint = false
+	customLogger.colors = false
+	customLogger.traceCaller = false
+	customLogger.traceCallerLevel = 5
+	customLogger.obscureSensitiveData = false
+
+	expected := toStr(customLogger)
+	actual := toStr(*NewLogger().SetConfigs(Configs{
+		LogLevel:             LevelError,
+		LogWriter:            os.Stderr,
+		JSONPrettyPrint:      Disable,
+		TraceCaller:          Disable,
+		SinglePointTracing:   Disable,
+		Colors:               Disable,
+		ObscureSensitiveData: Disable,
+		SensitiveParams:      []string{"password"},
+	}))
+
+	if actual != expected {
+		t.Errorf(errorFmt, "TestSetConfigsFullConfigsAllDisabled", expected, actual)
+	}
+}
+
+func TestLevel(t *testing.T) {
+	l := NewLogger()
 	testMap := map[string]int{
-		"trace":       1,
-		"debug":       2,
-		"info":        3,
-		"warn":        4,
-		"error":       5,
-		"invalidName": 3,
+		traceLabel: traceLevel,
+		infoLabel:  infoLevel,
+		warnLabel:  warnLevel,
+		errorLabel: errorLevel,
+		panicLabel: panicLevel,
+		fatalLabel: fatalLevel,
 	}
 
-	for label, level := range testMap {
-		LogLevel(label)
-		if logLevel != level {
-			t.Errorf("TestLogLevel failed: expected %d, got %d", level, logLevel)
+	for input, expected := range testMap {
+		if l.Level(input).level != expected {
+			t.Errorf(errorFmt, "TestLevel", expected, l.level)
+		}
+	}
+}
+
+func TestLogWriter(t *testing.T) {
+	l := NewLogger()
+	testSlice := []io.Writer{
+		os.Stdin,
+		os.Stdout,
+		os.Stderr,
+	}
+
+	for _, expected := range testSlice {
+		if l.LogWriter(expected).logWriter != expected {
+			t.Errorf(errorFmt, "TestLogWriter", expected, l.logWriter)
 		}
 	}
 }
 
 func TestEnableDisableJSONPrettyPrint(t *testing.T) {
-	errFormat := "TestEnableDisableJSONPrettyPrint failed: JSONPrettyPrint expected %t, got %t "
-	EnableJSONPrettyPrint()
-	if !JSONPrettyPrint {
-		t.Errorf(errFormat, true, JSONPrettyPrint)
+	l := NewLogger()
+	errFormat := "TestEnableDisableJSONPrettyPrint failed: expected prettyPrint %t, got %t"
+
+	if !l.EnableJSONPrettyPrint().prettyPrint {
+		t.Errorf(errFormat, true, l.prettyPrint)
 	}
-	DisableJSONPrettyPrint()
-	if JSONPrettyPrint {
-		t.Errorf(errFormat, false, JSONPrettyPrint)
+	if l.DisableJSONPrettyPrint().prettyPrint {
+		t.Errorf(errFormat, false, l.prettyPrint)
 	}
 }
 
-var testsuite = []struct {
-	in       interface{}
-	expected string
-}{
-	{"This is a test", `"message":"This is a test"`},
-	{42, `"message":42`},
-	{13.75, `"message":13.75`},
-	{false, `"message":false`},
+func TestEnableDisableTraceCaller(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableTraceCaller failed: expected traceCaller %t, got %t"
+
+	if !l.EnableTraceCaller().traceCaller {
+		t.Errorf(errFormat, true, l.traceCaller)
+	}
+	if l.DisableTraceCaller().traceCaller {
+		t.Errorf(errFormat, false, l.traceCaller)
+	}
 }
 
-func TestSimpleLogger(t *testing.T) {
+func TestEnableDisableSinglePointTracing(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableSinglePointTracing failed: expected traceCallerLevel %d, got %d"
+
+	if l.EnableSinglePointTracing().traceCallerLevel != 6 {
+		t.Errorf(errFormat, 6, l.traceCallerLevel)
+	}
+	if l.DisableSinglePointTracing().traceCallerLevel != 5 {
+		t.Errorf(errFormat, 5, l.traceCallerLevel)
+	}
+}
+
+func TestEnableDisableLoggerColors(t *testing.T) {
+	l := NewLogger()
+	errFormat := "TestEnableDisableLoggerColors failed: expected colors %t, got %t"
+
+	if !l.EnableColors().colors {
+		t.Errorf(errFormat, true, l.colors)
+	}
+	if l.DisableColors().colors {
+		t.Errorf(errFormat, false, l.colors)
+	}
+}
+
+func TestEnableDisableObscureSensitiveParams(t *testing.T) {
+
+	params := []string{"password", "age"}
+	errFormat := "TestEnableDisableObscureSensitiveParams failed: expected obscureSensitiveData %t, got %t"
+
+	l := NewLogger()
+	l.EnableObscureSensitiveData(params)
+
+	if !l.obscureSensitiveData {
+		t.Errorf(errFormat, true, l.obscureSensitiveData)
+	}
+	if !reflect.DeepEqual(l.sensitiveParams, params) {
+		t.Errorf("TestEnableDisableObscureSensitiveParams failed: expected sensitiveParams %v. got %v", params, l.sensitiveParams)
+	}
+
+	l.DisableObscureSensitiveData()
+	if l.obscureSensitiveData {
+		t.Errorf(errFormat, false, l.obscureSensitiveData)
+	}
+}
+
+func TestSetSensitiveParams(t *testing.T) {
+
+	params := []string{"secret", "privatekey"}
+	errFormat := "TestEnableDisableObscureSensitiveParams failed: expected sensitiveParams %v. got %v"
+
+	l := NewLogger()
+	l.EnableObscureSensitiveData(params)
+
+	if !reflect.DeepEqual(l.SetSensitiveParams(params).sensitiveParams, params) {
+		t.Errorf(errFormat, params, l.sensitiveParams)
+	}
+}
+
+type account struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func TestInfoLogging(t *testing.T) {
+
+	var testLoggingMap = map[interface{}]string{
+		"":      `"level":"%s","message":""`,
+		"hello": `"level":"%s","message":"hello"`,
+		`{"name": "gyoza", "cool": true, "password": "Sup3rS3cr3t"}`: `"level":"%s","message":{"cool":true,"name":"gyoza","password":"**********"}`,
+		"{\"name\": \"gyozatech\", \"repo\": \"noodlog\"}":           `"level":"%s","message":{"name":"gyozatech","repo":"noodlog"}`,
+		account{"gyozatech", "Sup3rS3cr3t"}:                          `"level":"%s","message":{"password":"**********","username":"gyozatech"}`,
+	}
 
 	var b bytes.Buffer
-	LogWriter(&b)                                             // we want to write log in memory
-	SetConfigs(Configs{LogLevel: LevelInfo, Colors: Disable}) // we don't want any ANSI sequence in the strings
+	b.Reset()
+	l := NewLogger().EnableObscureSensitiveData([]string{"password"}).LogWriter(&b)
 
-	for _, tt := range testsuite {
-		b.Reset() // clears the buffer for the next log message
-		Info(tt.in)
-		if !strings.Contains(b.String(), tt.expected) {
-			t.Errorf("Failed Test logger! Expected: %v, got: %v", tt.expected, b.String())
+	for input, expectedFmt := range testLoggingMap {
+		if input != "" {
+			l.Info(input)
+		} else {
+			l.Info()
+		}
+
+		actual := b.String()
+		expected := fmt.Sprintf(expectedFmt, "info")
+		if !strings.Contains(actual, expected) {
+			t.Errorf(errorFmt, "TestInfoLogging", expected, actual)
+		}
+		b.Reset()
+	}
+}
+
+func TestLogging(t *testing.T) {
+
+	var b bytes.Buffer
+	b.Reset()
+	l := NewLogger().
+		EnableObscureSensitiveData([]string{"password"}).
+		EnableTraceCaller().
+		EnableColors().
+		LogWriter(&b)
+
+	for _, level := range []string{"trace", "debug", "info", "warn", "error"} {
+
+		input1 := "logging example"
+		input2 := "text"
+
+		input3 := "logging example %s"
+		input4 := "logging example text"
+
+		expected := `{"level":"*","message":"logging example text","time":"*"}`
+
+		switch level {
+		case "trace":
+			l.Trace(input1, input2)
+		case "debug":
+			l.Debug(input1, input2)
+		case "info":
+			l.Info(input1, input2)
+		case "warn":
+			l.DisableObscureSensitiveData()
+			l.Warn(input4)
+		case "error":
+			l.Error(input3, input2)
+		}
+
+		actual := b.String()
+
+		if level == "debug" || level == "trace" {
+			if actual != "" {
+				t.Errorf(errorFmt, "TestLogging", "", actual)
+			}
+		} else {
+			if !Matches(actual, expected) {
+				t.Errorf(errorFmt, "TestLogging", expected, actual)
+			}
+		}
+
+		b.Reset()
+	}
+}
+
+func TestLogPanic(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf(errorFmt, "TestLogPanic", "panic", "not-panic")
+		}
+	}()
+
+	l := NewLogger()
+	l.Panic("Hello, I'm gonna panic!")
+}
+
+func TestLogFatal(t *testing.T) {
+
+	var b bytes.Buffer
+	b.Reset()
+	l := NewLogger().EnableJSONPrettyPrint().LogWriter(&b)
+
+	os.Setenv("EXIT_ON_FATAL_DISABLED", "true")
+	l.Fatal("Hello, I'm gonna exit!")
+	actual := b.String()
+	expected := `{
+		"level": "fatal",
+		"message": "Hello, I'm gonna exit!",
+		"time": "*"
+	 }`
+	b.Reset()
+	if Matches(actual, expected) {
+		t.Errorf(errorFmt, "TestLogFatal", expected, actual)
+	}
+}
+
+func composeColor(color string) string {
+	return "\033[" + color + "m"
+}
+
+func TestSetCustomColors(t *testing.T) {
+	errFormat := "TestSetCustomColors failed: expected %s got %s"
+
+	l := NewLogger()
+
+	l.SetCustomColors(CustomColors{
+		Trace: Blue,
+		Debug: Purple,
+		Info:  Yellow,
+		Warn:  Green,
+		Error: Default,
+	})
+
+	if blueCode := composeColor(colorBlue); l.colorMap[traceLabel] != blueCode {
+		t.Errorf(errFormat, blueCode, l.colorMap[traceLabel])
+	}
+	if purpleCode := composeColor(colorPurple); l.colorMap[debugLabel] != purpleCode {
+		t.Errorf(errFormat, purpleCode, l.colorMap[debugLabel])
+	}
+	if yellowCode := composeColor(colorYellow); l.colorMap[infoLabel] != yellowCode {
+		t.Errorf(errFormat, yellowCode, l.colorMap[infoLabel])
+	}
+	if greenCode := composeColor(colorGreen); l.colorMap[warnLabel] != greenCode {
+		t.Errorf(errFormat, greenCode, l.colorMap[warnLabel])
+	}
+	if defaultCode := composeColor(colorReset); l.colorMap[errorLabel] != defaultCode {
+		t.Errorf(errFormat, defaultCode, l.colorMap[errorLabel])
+	}
+}
+
+var colorTestMap = map[Color]string{
+	NewColor(Blue):   composeColor(colorBlue),
+	NewColor(Purple): composeColor(colorPurple),
+}
+
+func TestSetTraceColor(t *testing.T) {
+	l := NewLogger()
+
+	for color, colorCode := range colorTestMap {
+		l.SetTraceColor(color)
+		if actualCode := l.colorMap[traceLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetTraceColor", colorCode, actualCode)
 		}
 	}
 }
 
-//TestEnableDisableObscureSensitiveData
+func TestSetDebugColor(t *testing.T) {
+	l := NewLogger()
 
-//TestSetSensitiveParams
+	for color, colorCode := range colorTestMap {
+		l.SetDebugColor(color)
+		if actualCode := l.colorMap[debugLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetDebugColor", colorCode, actualCode)
+		}
+	}
+}
 
-//TestSetComposeLog
+func TestSetInfoColor(t *testing.T) {
 
-//TestSetComposeMessage
+	l := NewLogger()
 
-//TestStringify
+	for color, colorCode := range colorTestMap {
+		l.SetInfoColor(color)
+		if actualCode := l.colorMap[infoLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetInfoColor", colorCode, actualCode)
+		}
+	}
+}
 
-//TestAdaptMessage
+func TestSetWarnColor(t *testing.T) {
+	l := NewLogger()
 
-//TestStrToObj
+	for color, colorCode := range colorTestMap {
+		l.SetWarnColor(color)
+		if actualCode := l.colorMap[warnLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetWarnColor", colorCode, actualCode)
+		}
+	}
+}
 
-//TestObscureSensitiveData
+func TestSetErrorColor(t *testing.T) {
+	l := NewLogger()
 
-//TestObscureParam
+	for color, colorCode := range colorTestMap {
+		l.SetErrorColor(color)
+		if actualCode := l.colorMap[errorLabel]; actualCode != colorCode {
+			t.Errorf(errorFmt, "TestSetErrorColor", colorCode, actualCode)
+		}
+	}
+}
+
+func TestAdaptMessage(t *testing.T) {
+
+	testMap := map[interface{}]string{
+		struct{ test string }{"Hello test"}:  "{Hello test}",
+		"Hi message":                         "Hi message",
+		`{"name": "John", "surname": "Doe"}`: `map[name:John surname:Doe]`,
+	}
+
+	var b bytes.Buffer
+	b.Reset()
+	l := NewLogger().LogWriter(&b)
+
+	for input, expected := range testMap {
+		actual := l.adaptMessage(input)
+		if toStr(actual) != expected {
+			t.Errorf(errorFmt, "TestAdaptMessage", expected, actual)
+		}
+	}
+
+}

@@ -4,22 +4,42 @@ import (
 	"testing"
 )
 
-func TestIsValidTrueColor(t *testing.T) {
-	errFormat := "TestIsValidTrueColor failed: expected true found %t"
+var (
+	redCode    = "\033[41m"
+	greenCode  = "\033[42m"
+	yellowCode = "\033[43m"
+	blueCode   = "\033[44m"
+	purpleCode = "\033[45m"
+	cyanCode   = "\033[46m"
+	resetCode  = "\033[0m"
+)
+
+var testData = map[string]Color{
+	redColor:       {Code: &redCode},
+	greenColor:     {Code: &greenCode},
+	yellowColor:    {Code: &yellowCode},
+	blueColor:      {Code: &blueCode},
+	purpleColor:    {Code: &purpleCode},
+	cyanColor:      {Code: &cyanCode},
+	"invalidColor": {Code: &resetCode},
+}
+
+func TestIsValidColor(t *testing.T) {
+	errFormat := "TestIsValidColor failed: expected true found %t"
 
 	validColor := 255
 	negativeColor := -1
 	overflowColor := 256
 
-	if actual := IsValidTrueColor(validColor); actual != true {
+	if actual := isValidColor(validColor); !actual {
 		t.Errorf(errFormat, actual)
 	}
 
-	if actual := IsValidTrueColor(negativeColor); actual != false {
+	if actual := isValidColor(negativeColor); actual {
 		t.Errorf(errFormat, actual)
 	}
 
-	if actual := IsValidTrueColor(overflowColor); actual != false {
+	if actual := isValidColor(overflowColor); actual {
 		t.Errorf(errFormat, actual)
 	}
 }
@@ -36,13 +56,13 @@ func TestNewColor(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		yellowColor:    Color{Code: &yellowCode},
-		blueColor:      Color{Code: &blueCode},
-		purpleColor:    Color{Code: &purpleCode},
-		cyanColor:      Color{Code: &cyanCode},
-		"invalidColor": Color{Code: &resetCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		yellowColor:    {Code: &yellowCode},
+		blueColor:      {Code: &blueCode},
+		purpleColor:    {Code: &purpleCode},
+		cyanColor:      {Code: &cyanCode},
+		"invalidColor": {Code: &resetCode},
 	}
 
 	for label, expected := range testData {
@@ -64,11 +84,11 @@ func TestNewColorRGB(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		blueColor:      Color{Code: &blueCode},
-		"mixedColor":   Color{Code: &mixedCode},
-		"invalidColor": Color{Code: &invalidCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		blueColor:      {Code: &blueCode},
+		"mixedColor":   {Code: &mixedCode},
+		"invalidColor": {Code: &invalidCode},
 	}
 
 	if actual := NewColorRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
@@ -104,13 +124,13 @@ func TestBackground(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		yellowColor:    Color{Code: &yellowCode},
-		blueColor:      Color{Code: &blueCode},
-		purpleColor:    Color{Code: &purpleCode},
-		cyanColor:      Color{Code: &cyanCode},
-		"invalidColor": Color{Code: &resetCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		yellowColor:    {Code: &yellowCode},
+		blueColor:      {Code: &blueCode},
+		purpleColor:    {Code: &purpleCode},
+		cyanColor:      {Code: &cyanCode},
+		"invalidColor": {Code: &resetCode},
 	}
 
 	for label, expected := range testData {
@@ -132,30 +152,30 @@ func TestBackgroundRGB(t *testing.T) {
 	)
 
 	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		blueColor:      Color{Code: &blueCode},
-		"mixedColor":   Color{Code: &mixedCode},
-		"invalidColor": Color{Code: &invalidCode},
+		redColor:       {Code: &redCode},
+		greenColor:     {Code: &greenCode},
+		blueColor:      {Code: &blueCode},
+		"mixedColor":   {Code: &mixedCode},
+		"invalidColor": {Code: &invalidCode},
 	}
 
-	if actual := BackgroundRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
+	if actual := backgroundRGB(255, 0, 0); *actual.Code != *testData[redColor].Code {
 		t.Errorf(errFormat, redColor, actual, testData[redColor])
 	}
 
-	if actual := BackgroundRGB(0, 255, 0); *actual.Code != *testData[greenColor].Code {
+	if actual := backgroundRGB(0, 255, 0); *actual.Code != *testData[greenColor].Code {
 		t.Errorf(errFormat, greenColor, actual, testData[greenColor])
 	}
 
-	if actual := BackgroundRGB(0, 0, 255); *actual.Code != *testData[blueColor].Code {
+	if actual := backgroundRGB(0, 0, 255); *actual.Code != *testData[blueColor].Code {
 		t.Errorf(errFormat, blueColor, actual, testData[blueColor])
 	}
 
-	if actual := BackgroundRGB(128, 128, 128); *actual.Code != *testData["mixedColor"].Code {
+	if actual := backgroundRGB(128, 128, 128); *actual.Code != *testData["mixedColor"].Code {
 		t.Errorf(errFormat, "mixedColor", actual, testData["mixedColor"])
 	}
 
-	if actual := BackgroundRGB(256, 0, 0); *actual.Code != *testData["invalidColor"].Code {
+	if actual := backgroundRGB(256, 0, 0); *actual.Code != *testData["invalidColor"].Code {
 		t.Errorf(errFormat, "invalidColor", actual, testData["invalidColor"])
 	}
 }
@@ -164,38 +184,19 @@ func TestToCode(t *testing.T) {
 	errFormat := "TestToCode failed for empty Color: got %s, expected %s"
 
 	empty := Color{}
-	if actual := empty.ToCode(); actual != colorReset {
+	if actual := empty.toCode(); actual != colorReset {
 		t.Errorf(errFormat, actual, colorReset)
 	}
 
 	existingCode := "code"
 	existing := Color{Code: &existingCode}
 
-	if actual := existing.ToCode(); actual != existingCode {
+	if actual := existing.toCode(); actual != existingCode {
 		t.Errorf(errFormat, actual, existingCode)
 	}
 }
 
 func TestBackgroundOnColor(t *testing.T) {
-	var (
-		redCode    = "\033[41m"
-		greenCode  = "\033[42m"
-		yellowCode = "\033[43m"
-		blueCode   = "\033[44m"
-		purpleCode = "\033[45m"
-		cyanCode   = "\033[46m"
-		resetCode  = "\033[0m"
-	)
-
-	var testData = map[string]Color{
-		redColor:       Color{Code: &redCode},
-		greenColor:     Color{Code: &greenCode},
-		yellowColor:    Color{Code: &yellowCode},
-		blueColor:      Color{Code: &blueCode},
-		purpleColor:    Color{Code: &purpleCode},
-		cyanColor:      Color{Code: &cyanCode},
-		"invalidColor": Color{Code: &resetCode},
-	}
 
 	var existingCode = "code"
 	color := Color{Code: &existingCode}
@@ -207,103 +208,41 @@ func TestBackgroundOnColor(t *testing.T) {
 	}
 }
 
-func TestEnableDisableColors(t *testing.T) {
-	errFormat := "TestEnableDisableColors failed: expected %v colorEnabled, got %v"
+func TestBackgroundRGBOnColor(t *testing.T) {
 
-	if colorEnabled {
-		t.Errorf(errFormat, false, true)
-	}
-	EnableColors()
-	if !colorEnabled {
-		t.Errorf(errFormat, true, false)
-	}
-}
+	expected := "\x1b[38;2;12;12;12m\x1b[48;2;255;255;255m"
+	actual := NewColorRGB(12, 12, 12).BackgroundRGB(255, 255, 255).toCode()
 
-func TestSetTraceColor(t *testing.T) {
-	setColorAssertions("TestSetTraceColor", traceLabel, SetTraceColor, t)
-}
-
-func TestSetDebugColor(t *testing.T) {
-	setColorAssertions("TestSetDebugColor", traceLabel, SetTraceColor, t)
-}
-
-func TestSetInfoColor(t *testing.T) {
-	setColorAssertions("TestSetInfoColor", traceLabel, SetTraceColor, t)
-}
-
-func TestSetWarnColor(t *testing.T) {
-	setColorAssertions("TestSetWarnColor", traceLabel, SetTraceColor, t)
-}
-
-func TestSetErrorColor(t *testing.T) {
-	setColorAssertions("TestSetErrorColor", traceLabel, SetTraceColor, t)
-}
-
-func setColorAssertions(testName string, label string, setFunction func(color Color), t *testing.T) {
-	errFormat := "%s failed: expected %s, found %s"
-	testMap := map[Color]string{
-		NewColor(Blue):   composeColor(colorBlue),
-		NewColor(Purple): composeColor(colorPurple),
-	}
-	for color, colorCode := range testMap {
-		setFunction(color)
-		if actualCode := colorMap[label]; actualCode != colorCode {
-			t.Errorf(errFormat, testName, colorCode, actualCode)
-		}
+	if expected != actual {
+		t.Errorf(errorFmt, "TestBackgroundRGBOnColor", expected, actual)
 	}
 }
 
 func TestDetectColor(t *testing.T) {
 	empty := Color{}
-	if actual := DetectColor(empty); actual != empty {
+	if actual := detectColor(empty); actual != empty {
 		t.Errorf("TestDetectColor failed for empty Color: got %v, expected %v", actual, empty)
 	}
 
 	pointerOfString := Cyan
 	expectedColor := NewColor(Cyan)
-	if actual := DetectColor(pointerOfString); actual.ToCode() != expectedColor.ToCode() {
+	if actual := detectColor(pointerOfString); actual.toCode() != expectedColor.toCode() {
 		t.Errorf("TestDetectColor failed for pointer of a string: got %v, expected %v", actual, expectedColor)
 	}
 
+	inputColor := NewColor(Cyan)
+	expectedColor = NewColor(Cyan)
+	if actual := detectColor(inputColor); actual.toCode() != expectedColor.toCode() {
+		t.Errorf("TestDetectColor failed for non emptu Color object: got %v, expected %v", actual.toCode(), expectedColor.toCode())
+	}
+
 	wrongType := "string"
-	if actual := DetectColor(wrongType); actual != empty {
+	if actual := detectColor(wrongType); actual != empty {
 		t.Errorf("TestDetectColor failed for invalidType: got %v, expected %v", actual, empty)
 	}
 
 	wrongContentPointer := &wrongType
-	if actual := DetectColor(wrongContentPointer); actual.ToCode() != colorReset {
+	if actual := detectColor(wrongContentPointer); actual.toCode() != colorReset {
 		t.Errorf("TestDetectColor failed for wrong color as type pointer of a string: got %v, expected %v", actual, colorReset)
-	}
-}
-
-func composeColor(color string) string {
-	return "\033[" + color + "m"
-}
-
-func TestSetCustomColors(t *testing.T) {
-	errFormat := "TestSetCustomColors failed: expected %s got %s"
-
-	setCustomColors(CustomColors{
-		Trace: Blue,
-		Debug: Purple,
-		Info:  Yellow,
-		Warn:  Green,
-		Error: Default,
-	})
-
-	if blueCode := composeColor(colorBlue); colorMap[traceLabel] != blueCode {
-		t.Errorf(errFormat, blueCode, colorMap[traceLabel])
-	}
-	if purpleCode := composeColor(colorPurple); colorMap[debugLabel] != purpleCode {
-		t.Errorf(errFormat, purpleCode, colorMap[debugLabel])
-	}
-	if yellowCode := composeColor(colorYellow); colorMap[infoLabel] != yellowCode {
-		t.Errorf(errFormat, yellowCode, colorMap[infoLabel])
-	}
-	if greenCode := composeColor(colorGreen); colorMap[warnLabel] != greenCode {
-		t.Errorf(errFormat, greenCode, colorMap[warnLabel])
-	}
-	if defaultCode := composeColor(colorReset); colorMap[errorLabel] != defaultCode {
-		t.Errorf(errFormat, defaultCode, colorMap[errorLabel])
 	}
 }

@@ -46,18 +46,20 @@ Open `main.go` and paste the following code:
 package main
 
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
 
+var log *noodlog.Logger
+
 func init() {
-   log.SetConfigs(
-      log.Configs{
-         LogLevel: log.LevelTrace,
-         JSONPrettyPrint: log.Enable,
-         TraceCaller: log.Enable,
-         Colors: log.Enable,
-         CustomColors: &log.CustomColors{ Trace: log.Cyan },
-         ObscureSensitiveData: log.Enable,
+   log = noodlog.NewLogger().SetConfigs(
+      noodlog.Configs{
+         LogLevel: noodlog.LevelTrace,
+         JSONPrettyPrint: noodlog.Enable,
+         TraceCaller: noodlog.Enable,
+         Colors: noodlog.Enable,
+         CustomColors: &noodlog.CustomColors{ Trace: noodlog.Cyan },
+         ObscureSensitiveData: noodlog.Enable,
          SensitiveParams: []string{"password"},
       },
     )
@@ -105,8 +107,14 @@ To set the logging level, after importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 you can use the facility method:
 
@@ -117,8 +125,8 @@ or the `SetConfigs` function:
 
 ```golang
 log.SetConfigs(
-    log.Configs{
-        LogLevel: log.LevelWarn,
+    noodlog.Configs{
+        LogLevel: noodlog.LevelWarn,
     },
 )
 ```
@@ -134,8 +142,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 **To enable** pretty printing of the JSON logs you can use:
@@ -147,12 +161,12 @@ or
 
 ```golang
 log.SetConfigs(
-    log.Configs{
-    JSONPrettyPrint: log.Enable,
+    noodlog.Configs{
+       JSONPrettyPrint: noodlog.Enable,
     },
 )
 ```
-`log.Enable` is a pre-built pointer to the bool _true_.
+`noodlog.Enable` is a pre-built pointer to the bool _true_.
 
 **to disable** pretty printing you can use:
 
@@ -163,12 +177,12 @@ or
 
 ```golang
 log.SetConfigs(
-    log.Configs{
-    JSONPrettyPrint: log.Disable,
+    noodlog.Configs{
+       JSONPrettyPrint: noodlog.Disable,
     },
 )
 ```
-`log.Disable` is a pre-built pointer to the bool _false_.
+`noodlog.Disable` is a pre-built pointer to the bool _false_.
 
 **The default value is _false_**. 
 
@@ -180,8 +194,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 **to enable** colors in JSON logs you can use:
@@ -193,12 +213,12 @@ or
 
 ```golang
 log.SetConfigs(
-    log.Configs{
-        Colors: log.Enable,
+    noodlog.Configs{
+        Colors: noodlog.Enable,
     },
 )
 ```
-`log.Enable` is a pre-built pointer to the bool _true_.
+`noodlog.Enable` is a pre-built pointer to the bool _true_.
 
 **To disable** colors you can use:
 
@@ -209,12 +229,12 @@ or
 
 ```golang
 log.SetConfigs(
-    log.Configs{
-        Colors: log.Disable,
+    noodlog.Configs{
+        Colors: noodlog.Disable,
     },
 )
 ```
-`log.Disable` is a pre-built pointer to the bool _false_.
+`noodlog.Disable` is a pre-built pointer to the bool _false_.
 
 **The default value is _false_**. 
 
@@ -226,7 +246,7 @@ The **basic** way to use a custom color is declaring using a pointer of a string
 For instance, you can customize trace color by:
 
 ```golang
-log.SetTraceColor(log.Cyan)
+log.SetTraceColor(noodlog.Cyan)
 ```
 
 A more detailed explanation of each log level is available later into this section.
@@ -238,19 +258,19 @@ For each level it can be composed using a string or a true color notation.
 
 **Trivial** usage is creating a new color like: 
 ```golang
-log.NewColor(log.Red)
+log.NewColor(noodlog.Red)
 ```
 It results a red text on default background
 
 Adding a background color can be done through:
 ```golang
-log.NewColor(log.Red).Background(log.Cyan)
+log.NewColor(noodlog.Red).Background(noodlog.Cyan)
 ```
 In this scenario it prints red text on cyan background
 
 A third option is to edit just background color using default text color:
 ```golang
-log.Background(log.Cyan)
+log.Background(noodlog.Cyan)
 ```
 A list of pre-built pointer of a string is [here](#Composition of a color).
 
@@ -273,29 +293,29 @@ As in the previous scenario, ``NewColorRGB`` and ``BackgroundRGB`` hasn't to be 
 
 Color can be used to set color of Trace log, by typing:
 ```golang
-log.SetTraceColor(log.NewColorRGB(255,0,0).BackgroundRGB(0,0,255))
+log.SetTraceColor(noodlog.NewColorRGB(255,0,0).BackgroundRGB(0,0,255))
 ```
 
 **You can customize the single colors** (for log level) by using:
 
 ```golang
-log.SetTraceColor(log.Cyan)
-log.SetDebugColor(log.NewColorRGB(255,255,0))
-log.SetInfoColor(log.NewColor(log.Red).Background(log.Cyan))
-log.SetWarnColor(log.NewColor(log.Green).BackgroundRGB(0,255,255))
-log.SetErrorColor(log.NewColorRGB(128,255,0).Background(log.Purple))
+log.SetTraceColor(noodlog.Cyan)
+log.SetDebugColor(noodlog.NewColorRGB(255,255,0))
+log.SetInfoColor(noodlog.NewColor(noodlog.Red).Background(noodlog.Cyan))
+log.SetWarnColor(noodlog.NewColor(noodlog.Green).BackgroundRGB(0,255,255))
+log.SetErrorColor(noodlog.NewColorRGB(128,255,0).Background(noodlog.Purple))
 ```
 or
 ```golang
 log.SetConfigs(
-    log.Configs{
-        Colors: log.Enable,
-        CustomColors: &log.CustomColors{ 
-            Trace: log.Cyan, 
-            Debug: log.NewColorRGB(255,255,0),
-            Info:  log.NewColor(log.Red).Background(log.Cyan),
-            Warn:  log.NewColor(log.Green).BackgroundRGB(0,255,255),
-            Error: log.NewColorRGB(128,255,0).Background(log.Purple),    
+    noodlog.Configs{
+        Colors: noodlog.Enable,
+        CustomColors: &noodlog.CustomColors{ 
+            Trace: noodlog.Cyan, 
+            Debug: noodlog.NewColorRGB(255,255,0),
+            Info:  noodlog.NewColor(noodlog.Red).Background(noodlog.Cyan),
+            Warn:  noodlog.NewColor(noodlog.Green).BackgroundRGB(0,255,255),
+            Error: noodlog.NewColorRGB(128,255,0).Background(noodlog.Purple),    
         },
     },
 )
@@ -320,8 +340,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 **to enable** the trace caller you can use:
@@ -331,12 +357,12 @@ log.EnableTraceCaller()
 or
 ```golang
 log.SetConfigs(
-    log.Configs{
-        TraceCaller: log.Enable,
+    noodlog.Configs{
+        TraceCaller: noodlog.Enable,
     },
 )
 ```
-`log.Enable` is a pre-built pointer to the bool _true_.
+`noodlog.Enable` is a pre-built pointer to the bool _true_.
 
 **To disable** it:
 ```golang
@@ -345,12 +371,12 @@ log.DisableTraceCaller()
 or
 ```golang
 log.SetConfigs(
-    log.Configs{
-        TraceCaller: log.Disable,
+    noodlog.Configs{
+        TraceCaller: noodlog.Disable,
     },
 )
 ```
-`log.Disable` is a pre-built pointer to the bool _false_.
+`noodlog.Disable` is a pre-built pointer to the bool _false_.
 
 The **default value** is _false_.
 
@@ -380,9 +406,12 @@ import (
     "github.com/gyozatech/noodlog"
 )
 
+var l *noodlog.Logger
+
 func init() {
+    l = noodlog.NewLogger()
     // configure logger once
-    noodlog.SetConfig(
+    l.SetConfig(
         noodlog.Configs{
          TraceCaller: noodlog.Enable,
          SinglePointTracing: noodlog.Enable,
@@ -394,7 +423,7 @@ func init() {
 func Info(message ...interface{}) {
     // if we wouldn't enable SinglePointTracing
     // logger.Info would have been considered the caller to be tracked
-    noodlog.Info(message...)
+    l.Info(message...)
 }
 ```
 
@@ -408,8 +437,14 @@ After importing the library with:
 
 ```golang
 import (
-    log "github.com/gyozatech/noodlog"
+    "github.com/gyozatech/noodlog"
 )
+
+var log *noodlog.Logger
+
+func init() {
+   log = noodlog.NewLogger()
+}
 ```
 
 You can **enable** the sensitive params obscuration with the facility methods:
@@ -421,13 +456,13 @@ or with the `SetConfig` function:
 
 ```golang
 log.SetConfigs(
-    log.Configs{
-        ObscureSensitiveData: log.Enable,
+    noodlog.Configs{
+        ObscureSensitiveData: noodlog.Enable,
         SensitiveParams: []string{"param1", "param2", "param3"},
     },
 )
 ```
-Where `log.Enable` is a pre-built pointer to the bool _true_.
+Where `noodlog.Enable` is a pre-built pointer to the bool _true_.
 
 **To disable** the sensitive params obscuration you can set:
 
@@ -437,12 +472,12 @@ log.DisableObscureSensitiveData()
 or 
 ```golang
 log.SetConfigs(
-    log.Configs{
-        ObscureSensitiveData: log.Disable,
+    noodlog.Configs{
+        ObscureSensitiveData: noodlog.Disable,
     },
 )
 ```
-Where `log.Disable` is a pre-built pointer to the bool _false_.
+Where `noodlog.Disable` is a pre-built pointer to the bool _false_.
 
 The *default* value for the obscuration is _false_.
 
@@ -453,7 +488,3 @@ The *default* value for the obscuration is _false_.
 To contribute to the project create a fork on your personal Github profile and open a pull request to the main branch of the project using the template specified here:
 
 (PR Template)[https://github.com/gyozatech/noodlog/blob/main/.github/PULL_REQUEST_TEMPLATE.md]
-
-
-## Benchmark
-
