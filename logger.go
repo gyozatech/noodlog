@@ -257,7 +257,7 @@ func (l *Logger) Fatal(message ...interface{}) {
 
 func (l *Logger) printLog(label string, message []interface{}) {
 	if logLevels[label] >= l.level {
-		fmt.Fprintf(l.logWriter, l.composeLog(label, message))
+		fmt.Fprintln(l.logWriter, l.composeLog(label, message))
 	}
 }
 
