@@ -486,6 +486,5 @@ The *default* value for the obscuration is _false_.
 
 ## Contribute to the project
 
-To contribute to the project create a fork on your personal Github profile and open a pull request to the main branch of the project using the template specified here:
-
-(PR Template)[https://github.com/gyozatech/noodlog/blob/main/.github/PULL_REQUEST_TEMPLATE.md]
+If you want to contribute to the project follow the following [guidelines](https://github.com/gyozatech/noodlog/blob/main/CONTRIBUTING.md).
+Any form of contribution is encouraged!
