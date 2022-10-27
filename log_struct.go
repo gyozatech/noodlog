@@ -22,6 +22,7 @@ type Configs struct {
 	CustomColors         *CustomColors
 	ObscureSensitiveData *bool
 	SensitiveParams      []string
+	EncodeTime           *EncodeTime
 }
 
 // CustomColors struct is used to specify the custom colors for the various log levels
@@ -31,6 +32,12 @@ type CustomColors struct {
 	Info  interface{}
 	Warn  interface{}
 	Error interface{}
+}
+
+// EncodeTime struct is used to specify the custom time format for the json logs
+type EncodeTime struct {
+	Format   string
+	TimeZone string
 }
 
 // ~~~~~~~~~~~ Prebuilt pointers to be used in the SetConfigs ~~~~~~~~~~~~ //

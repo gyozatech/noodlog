@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"time"
 )
 
 // Logger represent the logger object
@@ -20,6 +19,7 @@ type Logger struct {
 	sensitiveParams      []string
 	colors               bool
 	colorMap             map[string]string
+	encodeTime           EncodeTime
 }
 
 // NewLogger func is the default constructor of a Logger
@@ -34,6 +34,7 @@ func NewLogger() *Logger {
 		sensitiveParams:      nil,
 		colors:               false,
 		colorMap:             colorMap,
+		encodeTime:           EncodeTime{},
 	}
 }
 
@@ -85,6 +86,9 @@ func (l *Logger) SetConfigs(configs Configs) *Logger {
 	}
 	if configs.SensitiveParams != nil {
 		l.SetSensitiveParams(configs.SensitiveParams)
+	}
+	if configs.EncodeTime != nil {
+		l.SetCustomTime(*configs.EncodeTime)
 	}
 	return l
 }
@@ -217,6 +221,12 @@ func (l *Logger) SetSensitiveParams(params []string) *Logger {
 	return l
 }
 
+// SetCustomTime overrides the default time format  when custom time is passed into Customtime configs
+func (l *Logger) SetCustomTime(params EncodeTime) *Logger {
+	l.encodeTime = params
+	return l
+}
+
 // Trace function prints a log with trace log level
 func (l *Logger) Trace(message ...interface{}) {
 	l.printLog(traceLabel, message)
@@ -266,7 +276,7 @@ func (l *Logger) composeLog(level string, message []interface{}) string {
 	logMsg := record{
 		Level:   level,
 		Message: l.composeMessage(message),
-		Time:    strings.Split(time.Now().String(), "m")[0],
+		Time:    getTime(l.encodeTime),
 	}
 
 	if l.traceCaller {
