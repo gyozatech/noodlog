@@ -32,7 +32,7 @@ It allows you to:
 
 ## Usage
 
-Let's assume you have Go 1.16+ istalled on your computer.
+Let's assume you have Go 1.16+ installed on your computer.
 Execute the following:
 
 ```shell
