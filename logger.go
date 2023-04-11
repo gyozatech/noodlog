@@ -311,16 +311,16 @@ func (l *Logger) composeMessage(message []interface{}) interface{} {
 func (l *Logger) adaptMessage(message interface{}) interface{} {
 	switch message.(type) {
 	case string:
-		strMsg := message.(string)
 		if l.obscureSensitiveData && len(l.sensitiveParams) != 0 {
-			return strToObj(obscureParams(strMsg, l.sensitiveParams))
+			return strToObj(obscureParams(message.(string), l.sensitiveParams))
 		}
-		return strToObj(strMsg)
+		return strToObj(message.(string))
+	case error:
+		return message.(error).Error()
 	default:
 		if l.obscureSensitiveData && len(l.sensitiveParams) != 0 {
 			jsn, _ := json.Marshal(message)
-			strMsg := obscureParams(string(jsn), l.sensitiveParams)
-			return strToObj(strMsg)
+			return strToObj(obscureParams(string(jsn), l.sensitiveParams))
 		}
 	}
 	return message
