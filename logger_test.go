@@ -454,6 +454,7 @@ func TestAdaptMessage(t *testing.T) {
 		struct{ test string }{"Hello test"}:  "{Hello test}",
 		"Hi message":                         "Hi message",
 		`{"name": "John", "surname": "Doe"}`: `map[name:John surname:Doe]`,
+		fmt.Errorf("Nice error!"):            "Nice error!",
 	}
 
 	var b bytes.Buffer
