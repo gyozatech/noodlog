@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func pointerOfString(v string) *string {
@@ -60,4 +61,49 @@ func traceCaller(traceCallerLevel int) (file, function string) {
 
 	return fmt.Sprintf("%s:%d", frame.File, frame.Line),
 		frame.Function
+}
+
+// IsEmpty function checks for the input if it is empty / vice versa
+func IsEmpty(i interface{}) bool {
+	switch v := i.(type) {
+	case string:
+		if strings.TrimSpace(v) == "" {
+			return true
+		}
+	default:
+		if v == nil {
+			return true
+		}
+	}
+	return false
+
+}
+
+// getTime function retreives the time in the custom time format or default if not defined
+func getTime(t EncodeTime) (now string) {
+	isEmptyZone := IsEmpty(t.TimeZone)
+	isEmptyFormat := IsEmpty(t.Format)
+	now = strings.Split(time.Now().String(), "m")[0]
+	if isEmptyZone && isEmptyFormat {
+		return
+	}
+
+	if !isEmptyZone {
+		tz, err := time.LoadLocation(t.TimeZone)
+		if err != nil {
+			return
+		}
+		if isEmptyFormat {
+			now = time.Now().In(tz).String()
+			return
+		}
+		now = time.Now().In(tz).Format(t.Format)
+	} else {
+		if isEmptyFormat {
+			return
+		}
+		now = time.Now().Format(t.Format)
+	}
+
+	return
 }

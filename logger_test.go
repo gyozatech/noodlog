@@ -23,6 +23,7 @@ var defaultLogger = Logger{
 	sensitiveParams:      nil,
 	colors:               false,
 	colorMap:             colorMap,
+	encodeTime:           EncodeTime{},
 }
 
 var customLogger = Logger{
@@ -35,6 +36,7 @@ var customLogger = Logger{
 	sensitiveParams:      []string{"password"},
 	colors:               true,
 	colorMap:             colorMap,
+	encodeTime:           EncodeTime{},
 }
 
 func toStr(obj interface{}) string {
@@ -90,6 +92,7 @@ func TestSetConfigsFullConfigsAllEnabled(t *testing.T) {
 		CustomColors:         &CustomColors{Trace: Color{}, Debug: Green},
 		ObscureSensitiveData: Enable,
 		SensitiveParams:      []string{"password"},
+		EncodeTime:           &EncodeTime{},
 	}))
 
 	if actual != expected {
@@ -115,6 +118,7 @@ func TestSetConfigsFullConfigsAllDisabled(t *testing.T) {
 		Colors:               Disable,
 		ObscureSensitiveData: Disable,
 		SensitiveParams:      []string{"password"},
+		EncodeTime:           &EncodeTime{},
 	}))
 
 	if actual != expected {
